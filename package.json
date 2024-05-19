@@ -1,7 +1,7 @@
 {
   "name": "mythril-vsc",
   "displayName": "Mythril-VSC",
-  "description": "",
+  "description": "Visual Studio Code extension to run Mythril analysis for Solidity files.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.89.0"
@@ -9,13 +9,27 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:mythril-vsc.analyze"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "mythril-vsc.helloWorld",
-      "title": "Hello World"
-    }]
+    "commands": [
+      {
+        "command": "mythril-vsc.analyze",
+        "title": "Mythril-VSC: Analyze File"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "mythril-vsc.analyze",
+          "when": "resourceLangId == solidity",
+          "group": "navigation",
+          "title": "Mythril-VSC: Analyze File"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
