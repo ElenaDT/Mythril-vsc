@@ -18,8 +18,8 @@ function activate(context) {
 
         const fileName = vscode.window.activeTextEditor.document.fileName;
         const baseName = vscode.workspace.asRelativePath(fileName);
-        const terminal = vscode.window.createTerminal('Myth Analyze');
-        terminal.sendText(`myth analyze "./${baseName}"`);
+        const terminal = vscode.window.createTerminal('Myth: Analyze');
+        terminal.sendText(`myth analyze ./${baseName} -o markdown > ${baseName}.md`);
         terminal.show();
     });
 
