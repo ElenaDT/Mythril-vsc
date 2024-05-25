@@ -1,99 +1,124 @@
-==== Dependence on predictable environment variable ====
-SWC ID: 120
-Severity: Low
-Contract: Numen
-Function name: execute(address)
-PC address: 404
-Estimated Gas Usage: 2074 - 37669
+# Analysis results for ./NumenCTF.sol
+
+## Dependence on predictable environment variable
+- SWC ID: 120
+- Severity: Low
+- Contract: Numen
+- Function name: `execute(address)`
+- PC address: 404
+- Estimated Gas Usage: 2074 - 37669
+
+### Description
+
 A control flow decision is made based on The block.number environment variable.
 The block.number environment variable is used to determine a control flow decision. Note that the values of variables like coinbase, gaslimit, block number and timestamp are predictable and can be manipulated by a malicious miner. Also keep in mind that attackers know hashes of earlier blocks. Don't use any of those environment variables as sources of randomness and be aware that use of these variables introduces a certain level of trust into miners.
---------------------
-In file: ./NumenCTF.sol:46
+In file: ./NumenCTF.sol:48
 
+### Code
+
+```
 require(b == block.number)
+```
 
---------------------
-Initial State:
+### Initial State:
 
 Account: [CREATOR], balance: 0x0, nonce:0, storage:{}
 Account: [ATTACKER], balance: 0x0, nonce:0, storage:{}
 
-Transaction Sequence:
+### Transaction Sequence
 
 Caller: [CREATOR], calldata: , decoded_data: , value: 0x0
 Caller: [CREATOR], function: execute(address), txdata: 0x4b64e4920000000000000000000000000000000000000000000000000000000000000000, decoded_data: ('0x0000000000000000000000000000000000000000',), value: 0x0
 
-==== State access after external call ====
-SWC ID: 107
-Severity: Medium
-Contract: Numen
-Function name: execute(address)
-PC address: 730
-Estimated Gas Usage: 9804 - 66718
+
+## State access after external call
+- SWC ID: 107
+- Severity: Medium
+- Contract: Numen
+- Function name: `execute(address)`
+- PC address: 730
+- Estimated Gas Usage: 9804 - 66718
+
+### Description
+
 Read of persistent state following external call
 The contract account state is accessed after an external call to a user defined address. To prevent reentrancy issues, consider accessing the state only before the call, especially if the callee is untrusted. Alternatively, a reentrancy lock can be used to prevent untrusted callees from re-entering the contract in an intermediate state.
---------------------
-In file: ./NumenCTF.sol:57
+In file: ./NumenCTF.sol:59
 
+### Code
+
+```
 owner
+```
 
---------------------
-Initial State:
+### Initial State:
 
 Account: [CREATOR], balance: 0x0, nonce:0, storage:{}
 Account: [ATTACKER], balance: 0x0, nonce:0, storage:{}
 
-Transaction Sequence:
+### Transaction Sequence
 
 Caller: [CREATOR], calldata: , decoded_data: , value: 0x0
 Caller: [ATTACKER], function: execute(address), txdata: 0x4b64e492000000000000000000000000deadbeefdeadbeefdeadbeefdeadbeefdeadbeef, decoded_data: ('0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',), value: 0x0
 
-==== State access after external call ====
-SWC ID: 107
-Severity: Medium
-Contract: Numen
-Function name: execute(address)
-PC address: 803
-Estimated Gas Usage: 9804 - 66718
+
+## State access after external call
+- SWC ID: 107
+- Severity: Medium
+- Contract: Numen
+- Function name: `execute(address)`
+- PC address: 803
+- Estimated Gas Usage: 9804 - 66718
+
+### Description
+
 Read of persistent state following external call
 The contract account state is accessed after an external call to a user defined address. To prevent reentrancy issues, consider accessing the state only before the call, especially if the callee is untrusted. Alternatively, a reentrancy lock can be used to prevent untrusted callees from re-entering the contract in an intermediate state.
---------------------
-In file: ./NumenCTF.sol:58
+In file: ./NumenCTF.sol:60
 
+### Code
+
+```
 owner = address(0)
+```
 
---------------------
-Initial State:
+### Initial State:
 
 Account: [CREATOR], balance: 0x0, nonce:0, storage:{}
 Account: [ATTACKER], balance: 0x0, nonce:0, storage:{}
 
-Transaction Sequence:
+### Transaction Sequence
 
 Caller: [CREATOR], calldata: , decoded_data: , value: 0x0
 Caller: [ATTACKER], function: execute(address), txdata: 0x4b64e492000000000000000000000000deadbeefdeadbeefdeadbeefdeadbeefdeadbeef, decoded_data: ('0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',), value: 0x0
 
-==== State access after external call ====
-SWC ID: 107
-Severity: Medium
-Contract: Numen
-Function name: execute(address)
-PC address: 856
-Estimated Gas Usage: 9804 - 66718
+
+## State access after external call
+- SWC ID: 107
+- Severity: Medium
+- Contract: Numen
+- Function name: `execute(address)`
+- PC address: 856
+- Estimated Gas Usage: 9804 - 66718
+
+### Description
+
 Write to persistent state following external call
 The contract account state is accessed after an external call to a user defined address. To prevent reentrancy issues, consider accessing the state only before the call, especially if the callee is untrusted. Alternatively, a reentrancy lock can be used to prevent untrusted callees from re-entering the contract in an intermediate state.
---------------------
-In file: ./NumenCTF.sol:58
+In file: ./NumenCTF.sol:60
 
+### Code
+
+```
 owner = address(0)
+```
 
---------------------
-Initial State:
+### Initial State:
 
 Account: [CREATOR], balance: 0x0, nonce:0, storage:{}
 Account: [ATTACKER], balance: 0x0, nonce:0, storage:{}
 
-Transaction Sequence:
+### Transaction Sequence
 
 Caller: [CREATOR], calldata: , decoded_data: , value: 0x0
 Caller: [ATTACKER], function: execute(address), txdata: 0x4b64e492000000000000000000000000deadbeefdeadbeefdeadbeefdeadbeefdeadbeef, decoded_data: ('0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',), value: 0x0
