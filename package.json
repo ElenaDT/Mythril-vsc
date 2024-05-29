@@ -14,7 +14,11 @@
     "commands": [
       {
         "command": "mythril-vsc.analyze",
-        "title": "Mythril-VSC: Analyze File"
+        "title": "Mythril-VSC: Analyze File",
+        "icon": {
+          "light": "mythril-audit-light.svg",
+          "dark": "mythril-audit-dark.svg"
+        }
       }
     ],
     "menus": {
@@ -22,8 +26,7 @@
         {
           "command": "mythril-vsc.analyze",
           "group": "commands",
-          "title": "Mythril-VSC: Analyze File",
-          "icon": "$(book)"
+          "title": "Mythril-VSC: Analyze File"
         }
       ],
       "editor/title": [
@@ -31,8 +34,7 @@
           "command": "mythril-vsc.analyze",
           "when": "resourceLangId == solidity",
           "group": "navigation",
-          "title": "Mythril-VSC: Analyze File",
-          "icon": "$(book)"
+          "title": "Mythril-VSC: Analyze File"
         }
       ]
     }
