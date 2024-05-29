@@ -3,6 +3,7 @@
   "displayName": "Mythril-VSC",
   "description": "Visual Studio Code extension to run Mythril analysis for Solidity files.",
   "version": "0.0.1",
+  "icon": "mythril-vsc.png",
   "engines": {
     "vscode": "^1.89.0"
   },
@@ -37,6 +38,16 @@
           "title": "Mythril-VSC: Analyze File"
         }
       ]
+    },
+    "configuration": {
+      "title": "Mythril-VSC",
+      "properties": {
+        "mythril-vsc.executionTimeout": {
+          "type": "number",
+          "default": 30,
+          "description": "The execution timeout in seconds for Mythril analysis."
+        }
+      }
     }
   },
   "scripts": {

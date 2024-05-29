@@ -23,15 +23,19 @@ async function analyzeCommand(fileUri) {
     }
 
     const baseName = vscode.workspace.asRelativePath(filePath);
-    await analyzeFile(filePath, baseName);
+
+    // Get execution timeout from user settings
+    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
+
+    await analyzeFile(filePath, baseName, executionTimeout);
   } catch (error) {
     vscode.window.showErrorMessage(error.message);
   }
 }
 
-async function analyzeFile(filePath, baseName) {
+async function analyzeFile(filePath, baseName, executionTimeout) {
   const terminal = vscode.window.createTerminal('Myth: Analyze');
-  terminal.sendText(`myth analyze ./${baseName} -o markdown --execution-timeout 30 > ${baseName}.md`);
+  terminal.sendText(`myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout} > ${baseName}.md`);
   terminal.show();
 }
 
@@ -47,7 +51,11 @@ async function promptForAnalysis() {
   if (selectedFileUri && selectedFileUri[0].fsPath) {
     const filePath = selectedFileUri[0].fsPath;
     const baseName = vscode.workspace.asRelativePath(filePath);
-    await analyzeFile(filePath, baseName);
+
+    // Get execution timeout from user settings
+    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
+
+    await analyzeFile(filePath, baseName, executionTimeout);
   } else {
     await analyzeWorkspace();
   }
