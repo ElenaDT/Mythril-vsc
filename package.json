@@ -9,9 +9,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:mythril-vsc.analyze"
-  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
@@ -21,12 +18,21 @@
       }
     ],
     "menus": {
-      "editor/context": [
+      "explorer/context": [
+        {
+          "command": "mythril-vsc.analyze",
+          "group": "commands",
+          "title": "Mythril-VSC: Analyze File",
+          "icon": "$(book)"
+        }
+      ],
+      "editor/title": [
         {
           "command": "mythril-vsc.analyze",
           "when": "resourceLangId == solidity",
           "group": "navigation",
-          "title": "Mythril-VSC: Analyze File"
+          "title": "Mythril-VSC: Analyze File",
+          "icon": "$(book)"
         }
       ]
     }
