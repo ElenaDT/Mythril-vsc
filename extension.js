@@ -1,14 +1,18 @@
 const vscode = require('vscode');
-const path = require('path');
+const utils = require('./utils.js');
 
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
   const disposable = vscode.commands.registerCommand('mythril-vsc.analyze', analyzeCommand);
   context.subscriptions.push(disposable);
 }
 
+
+async function mythrilLaucher(filePath, baseName) {
+    // Ottengo 'execution timeout' dalle settings
+    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
+
+    await analyzeFile(filePath, baseName, executionTimeout);
+}
 async function analyzeCommand(fileUri) {
   try {
     const filePath = fileUri ? fileUri.fsPath : getActiveTextEditorFilePath();
@@ -18,16 +22,10 @@ async function analyzeCommand(fileUri) {
       return;
     }
 
-    if (!isSolidityFile(filePath)) {
+    if (!utils.isSolidityFile(filePath)) {
       throw new Error('This command is only available for Solidity files (.sol).');
     }
-
-    const baseName = vscode.workspace.asRelativePath(filePath);
-
-    // Get execution timeout from user settings
-    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
-
-    await analyzeFile(filePath, baseName, executionTimeout);
+    mythrilLaucher(filePath, utils.getBaseName(filePath));
   } catch (error) {
     vscode.window.showErrorMessage(error.message);
   }
@@ -50,12 +48,8 @@ async function promptForAnalysis() {
 
   if (selectedFileUri && selectedFileUri[0].fsPath) {
     const filePath = selectedFileUri[0].fsPath;
-    const baseName = vscode.workspace.asRelativePath(filePath);
 
-    // Get execution timeout from user settings
-    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
-
-    await analyzeFile(filePath, baseName, executionTimeout);
+    mythrilLaucher(filePath, utils.getBaseName(filePath));
   } else {
     await analyzeWorkspace();
   }
@@ -71,10 +65,6 @@ async function analyzeWorkspace() {
   } else {
     throw new Error('No workspace folder found.');
   }
-}
-
-function isSolidityFile(filePath) {
-  return path.extname(filePath).toLowerCase() === '.sol';
 }
 
 function deactivate() {}
