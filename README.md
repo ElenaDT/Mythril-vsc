@@ -48,9 +48,9 @@ Dalle impostazioni è possibile scegliere il tempo di esecuzione del processo di
 
 ![Impostare tempo di esecuzione del processo](images/exec-timeout.png)
 
-## Roadmap Feature
+## Roadmap
 
-Tra le feature che intendo implementare ci sono:
+Tra le funzionalità che intendo implementare ci sono:
 
 - nelle impostazioni: permettere all'utente di scegliere il tipo di output generato dall'analisi (ex. Json, Json + Webview o Markdown);
 
