@@ -6,13 +6,15 @@ Un'estensione per integrare l'uso di Mythril in Visual Studio Code.
 
 Il branch di sviluppo è `develop`.
 
+> Dopo aver clonato questa repository, ricordare di lanciare `npm install` per avere tutte le **dipendenze** elencate nella sezione `devDependencies` del `package.json`.
+
 ### Debug
 
-Si può testare l'applicazione clonando la [relativa repository](https://github.com/ElenaDT/Tesi_code.git) e avviandone l'esecuzione con il debugger di VSC premendo il tasto F5.
+Si può testare l'applicazione clonando la presente repository e avviandone l'esecuzione con il debugger di VSC (premendo il tasto 'F5').
 
 ## Installazione dal codice binario
 
-Se si vuole solo una demo, è possibile installare l'estensione dal file `.vsix`.
+Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix` contenuto in questa repository.
 
 ### Istruzioni per installare VSIX
 
@@ -20,7 +22,12 @@ Se si vuole solo una demo, è possibile installare l'estensione dal file `.vsix`
 - click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
 - Riavviare VSC, se necessario.
 
+> Per far funzionare il plugin, è necessario aver installato [Mythril](https://mythril-classic.readthedocs.io/en/master/installation.html).
+
+
 ## Funzionalità
+
+### Analisi dei contratti
 
 Per lanciare l'analisi di un contratto, cliccare sul nome del file `<contratto>.sol` con il tasto destro > 'Mythril-VSC: Analyze File'.
 
@@ -30,14 +37,28 @@ In alternativa, se il contratto è aperto nell'editor, si può lanciare il coman
 
 ![Analisi dei contratti da editor](images/analyze-from-editor.png)
 
-## Impostazioni
+### Impostazioni dell'estensione
 
 Dalle impostazioni è possibile scegliere il tempo di esecuzione del processo di analisi del contratto.
 
 ![Impostare tempo di esecuzione del processo](images/exec-timeout.png)
 
-## Dipendenze
+## Roadmap Feature
 
-- node.js
-- npm
-- Mythril
+Tra le feature che intendo implementare ci sono:
+
+- nelle impostazioni: permettere all'utente di scegliere il tipo di output generato dall'analisi (ex. Json, Json + Webview o Markdown);
+
+- nel caso si scelga l'output 'Json + Webview', renderlo visibile con una [Webview](https://code.visualstudio.com/api/extension-guides/webview) aperta in una nuova tab di VSC;
+
+- Aggingere il supporto per gli **import** della libreria [OpenZeppelin](https://www.npmjs.com/package/@openzeppelin/contracts#usage).
+
+- nelle impostazioni: aggiungere ulteriori personalizzazioni per lanciare i comandi di Mythril.
+
+## To Dos
+
+- Studiare [altri metodi](https://code.visualstudio.com/api/extension-guides/overview) per rendere accessibili i comandi dalla UI.
+
+- Controllare le [linee guida per la UX](https://code.visualstudio.com/api/ux-guidelines/overview).
+
+- Migliorare l'icona dell'estensione.
