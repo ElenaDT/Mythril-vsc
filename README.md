@@ -1,65 +1,43 @@
 # mythril-vsc README
 
-This is the README for your extension "mythril-vsc". After writing up a brief description, we recommend including the following sections.
+Un'estensione per integrare l'uso di Mythril in Visual Studio Code.
 
-## Features
+## Sviluppo
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Il branch di sviluppo è `develop`.
 
-For example if there is an image subfolder under your extension project workspace:
+### Debug
 
-\!\[feature X\]\(images/feature-x.png\)
+Si può testare l'applicazione clonando la [relativa repository](https://github.com/ElenaDT/Tesi_code.git) e avviandone l'esecuzione con il debugger di VSC premendo il tasto F5.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Installazione dal codice binario
 
-## Requirements
+Se si vuole solo una demo, è possibile installare l'estensione dal file `.vsix`.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Istruzioni per installare VSIX
 
-## Extension Settings
+- Visualizza > Estensioni;
+- click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
+- Riavviare VSC, se necessario.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Funzionalità
 
-For example:
+Per lanciare l'analisi di un contratto, cliccare sul nome del file `<contratto>.sol` con il tasto destro > 'Mythril-VSC: Analyze File'.
 
-This extension contributes the following settings:
+![Analisi dei contratti](images/analyze.png)
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+In alternativa, se il contratto è aperto nell'editor, si può lanciare il comando 'Mythril-VSC: Analyze File' direttamente cliccando sull'icona in alto a destra come mostrato.
 
-## Known Issues
+![Analisi dei contratti da editor](images/analyze-from-editor.png)
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## Impostazioni
 
-## Release Notes
+Dalle impostazioni è possibile scegliere il tempo di esecuzione del processo di analisi del contratto.
 
-Users appreciate release notes as you update your extension.
+![Impostare tempo di esecuzione del processo](images/exec-timeout.png)
 
-### 1.0.0
+## Dipendenze
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- node.js
+- npm
+- Mythril
