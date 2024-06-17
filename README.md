@@ -2,6 +2,10 @@
 
 Un'estensione per integrare l'uso di Mythril in Visual Studio Code.
 
+## Dipendenze
+
+È necessario installare [Mythril insieme al compilatore per i file Solidity](https://mythril-classic.readthedocs.io/en/master/installation.html).
+
 ## Sviluppo
 
 Il branch di sviluppo è `develop`.
@@ -18,12 +22,11 @@ Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix
 
 ### Istruzioni per installare VSIX
 
+### [Torna su](#dipendenze)
+
 - Visualizza > Estensioni;
 - click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
 - Riavviare VSC, se necessario.
-
-> Per far funzionare il plugin, è necessario aver installato [Mythril](https://mythril-classic.readthedocs.io/en/master/installation.html).
-
 
 ## Funzionalità
 
