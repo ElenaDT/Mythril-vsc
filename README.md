@@ -23,10 +23,10 @@ Si può testare l'applicazione clonando la presente repository e avviandone l'es
 
 Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix` contenuto in questa repository.
 
-### Istruzioni per installare VSIX
+### Istruzioni per installare VSIX da Visual Studio Code
 
 - [Installare Mythril e Solc](#dipendenze);
-- Visualizza > Estensioni;
+- In VSC: Visualizza > Estensioni;
 - click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
 - Riavviare VSC, se necessario.
 
