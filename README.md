@@ -25,7 +25,7 @@ Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix
 
 ### Istruzioni per installare VSIX
 
-- [Installare Mythril e Solc](#dipendenze)
+- [Installare Mythril e Solc](#dipendenze);
 - Visualizza > Estensioni;
 - click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
 - Riavviare VSC, se necessario.
