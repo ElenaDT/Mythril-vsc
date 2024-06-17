@@ -10,6 +10,9 @@ Un'estensione per integrare l'uso di Mythril in Visual Studio Code.
 
 Il branch di sviluppo è `develop`.
 
+- [Installare Mythril e Solc](#dipendenze);
+- Clonare la presente repository;
+
 > Dopo aver clonato questa repository, ricordare di lanciare `npm install` per avere tutte le **dipendenze** elencate nella sezione `devDependencies` del `package.json`.
 
 ### Debug
@@ -22,8 +25,7 @@ Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix
 
 ### Istruzioni per installare VSIX
 
-### [Torna su](#dipendenze)
-
+- [Installare Mythril e Solc](#dipendenze)
 - Visualizza > Estensioni;
 - click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
 - Riavviare VSC, se necessario.
