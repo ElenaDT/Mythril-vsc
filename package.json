@@ -3,12 +3,18 @@
   "displayName": "Mythril-VSC",
   "description": "Visual Studio Code extension to run Mythril analysis for Solidity files.",
   "version": "0.0.1",
-  "icon": "mythril-vsc.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElenaDT/Tesi_code.git"
+  },
   "engines": {
     "vscode": "^1.89.0"
   },
   "categories": [
     "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.mythril-vsc.analyze"
   ],
   "main": "./extension.js",
   "contributes": {
