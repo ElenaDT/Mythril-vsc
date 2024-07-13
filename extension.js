@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const utils = require('./utils.js');
+const path = require('path');
 
 function activate(context) {
   const disposable = vscode.commands.registerCommand('mythril-vsc.analyze', analyzeCommand);
@@ -31,22 +32,21 @@ async function analyzeCommand(fileUri) {
   }
 }
 
-const path = require('path');
-
 async function analyzeFile(filePath, baseName, executionTimeout) {
-  const terminal = vscode.window.createTerminal('Myth: Analyze');
-
-  const fileDirectory = path.dirname(filePath);
-  const command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
   
-  if (process.platform === 'win32') {
-    // const wslCommand = `wsl.exe -e docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
-    terminal.sendText(command);
-  } else {
-    terminal.sendText(command);
-  }
+  const executionMode = vscode.workspace.getConfiguration().get('mythril.executionMode', 'docker');
+  const terminal = vscode.window.createTerminal('Myth: Analyze');
+  const fileDirectory = path.dirname(filePath);
+  let command = '';
 
+  if (executionMode === 'docker') {
+    command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+  } else {
+    command = `wsl.exe -e docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+  }
+  
   terminal.show();
+  terminal.sendText(command);
 }
 
 function getActiveTextEditorFilePath() {

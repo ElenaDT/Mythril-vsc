@@ -46,12 +46,22 @@
       ]
     },
     "configuration": {
-      "title": "Mythril-VSC",
+      "title": "Mythril-VSC Extension Settings",
       "properties": {
         "mythril-vsc.executionTimeout": {
           "type": "number",
           "default": 30,
           "description": "The execution timeout in seconds for Mythril analysis."
+        },
+        "mythril-vsc.executionMode": {
+          "type": "string",
+          "default": "local",
+          "enum": ["docker", "local"],
+          "enumDescriptions": [
+            "Use Docker for Mythril analysis",
+            "Use locally installed Mythril"
+          ],
+          "markdownDescription": "Choose the execution mode for Mythril analysis."
         }
       }
     }
