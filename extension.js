@@ -31,9 +31,21 @@ async function analyzeCommand(fileUri) {
   }
 }
 
+const path = require('path');
+
 async function analyzeFile(filePath, baseName, executionTimeout) {
   const terminal = vscode.window.createTerminal('Myth: Analyze');
-  terminal.sendText(`myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout} > ${baseName}.md`);
+
+  const fileDirectory = path.dirname(filePath);
+  const command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+  
+  if (process.platform === 'win32') {
+    // const wslCommand = `wsl.exe -e docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+    terminal.sendText(command);
+  } else {
+    terminal.sendText(command);
+  }
+
   terminal.show();
 }
 
