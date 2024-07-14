@@ -12,7 +12,7 @@ async function analyzeCommand(fileUri) {
     const filePath = fileUri ? fileUri.fsPath : getActiveTextEditorFilePath();
 
     if (!filePath) {
-      await promptForAnalysis();
+     // await promptForAnalysis();
       return;
     }
 
@@ -26,6 +26,9 @@ async function analyzeCommand(fileUri) {
   }
 }
 
+
+function deactivate() {}
+
 async function getAnalisysContext(filePath) {
     const fileDirectory = path.dirname(filePath);
     const baseName = utils.getBaseName(filePath);
@@ -35,17 +38,16 @@ async function getAnalisysContext(filePath) {
 
 async function analyzeFile(fileDirectory, baseName) {
   const mythrilVscConfig = vscode.workspace.getConfiguration('mythril-vsc');
-  
   const executionTimeout = mythrilVscConfig.get('executionTimeout', 60);
   const executionMode = mythrilVscConfig.get('executionMode', 'docker');
 
-  const terminal = vscode.window.createTerminal('Myth: Analyze');
-  let command = '';
+  const terminal = vscode.window.createTerminal('Myth: Analyze File');
+  let command;
 
   if (executionMode === 'docker') {
-    command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+    command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout}`;
   } else {
-    command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+    command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout}`;
   }
   
   terminal.show();
@@ -57,6 +59,7 @@ function getActiveTextEditorFilePath() {
   return editor ? editor.document.fileName : undefined;
 }
 
+// TODO [debug]: vedere quando e SE è chiamata
 async function promptForAnalysis() {
   const options = { filters: { 'Solidity Files': ['sol'] } };
   const selectedFileUri = await vscode.window.showOpenDialog(options);
@@ -65,24 +68,8 @@ async function promptForAnalysis() {
     const filePath = selectedFileUri[0].fsPath;
 
     getAnalisysContext(filePath);
-  } else {
-    await analyzeWorkspace();
   }
 }
-
-async function analyzeWorkspace() {
-  const currentFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : null;
-
-  if (currentFolder) {
-    const terminal = vscode.window.createTerminal('Myth: Analyze Workspace');
-    terminal.sendText(`myth analyze ${currentFolder.uri.fsPath} -o markdown --execution-timeout 30 > workspace.md`);
-    terminal.show();
-  } else {
-    throw new Error('No workspace folder found.');
-  }
-}
-
-function deactivate() {}
 
 module.exports = {
   activate,
