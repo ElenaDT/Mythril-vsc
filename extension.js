@@ -44,13 +44,16 @@ async function analyzeFile(fileDirectory, baseName) {
   const terminal = vscode.window.createTerminal('Myth: Analyze File');
   let command;
 
+  // FIXME stampare output dentro un markdown SOLO se il processo va a buon fine
   if (executionMode === 'docker') {
+    // FIXME rimuovere il container docker dopo l'utilizzo, deve essere 'usa e getta'
     command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout}`;
   } else {
     command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout}`;
   }
   
   terminal.show();
+  // TODO controllare il testo del report
   terminal.sendText(command);
 }
 

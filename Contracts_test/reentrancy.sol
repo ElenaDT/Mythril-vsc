@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.4;
 
-import "interfaces/IERC223.sol";
+import "./interfaces/IERC223.sol";
 
 contract Staking {
     IERC223 public token;
