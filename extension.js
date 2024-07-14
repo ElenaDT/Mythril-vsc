@@ -7,13 +7,6 @@ function activate(context) {
   context.subscriptions.push(disposable);
 }
 
-
-async function mythrilLaucher(filePath, baseName) {
-    // Ottengo 'execution timeout' dalle settings
-    const executionTimeout = vscode.workspace.getConfiguration('mythril-vsc').get('executionTimeout', 30);
-
-    await analyzeFile(filePath, baseName, executionTimeout);
-}
 async function analyzeCommand(fileUri) {
   try {
     const filePath = fileUri ? fileUri.fsPath : getActiveTextEditorFilePath();
@@ -26,23 +19,33 @@ async function analyzeCommand(fileUri) {
     if (!utils.isSolidityFile(filePath)) {
       throw new Error('This command is only available for Solidity files (.sol).');
     }
-    mythrilLaucher(filePath, utils.getBaseName(filePath));
+
+    getAnalisysContext(filePath);
   } catch (error) {
     vscode.window.showErrorMessage(error.message);
   }
 }
 
-async function analyzeFile(filePath, baseName, executionTimeout) {
+async function getAnalisysContext(filePath) {
+    const fileDirectory = path.dirname(filePath);
+    const baseName = utils.getBaseName(filePath);
+
+    await analyzeFile(fileDirectory, baseName);
+}
+
+async function analyzeFile(fileDirectory, baseName) {
+  const mythrilVscConfig = vscode.workspace.getConfiguration('mythril-vsc');
   
-  const executionMode = vscode.workspace.getConfiguration().get('mythril.executionMode', 'docker');
+  const executionTimeout = mythrilVscConfig.get('executionTimeout', 60);
+  const executionMode = mythrilVscConfig.get('executionMode', 'docker');
+
   const terminal = vscode.window.createTerminal('Myth: Analyze');
-  const fileDirectory = path.dirname(filePath);
   let command = '';
 
   if (executionMode === 'docker') {
     command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
   } else {
-    command = `wsl.exe -e docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
+    command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}.md`;
   }
   
   terminal.show();
@@ -61,7 +64,7 @@ async function promptForAnalysis() {
   if (selectedFileUri && selectedFileUri[0].fsPath) {
     const filePath = selectedFileUri[0].fsPath;
 
-    mythrilLaucher(filePath, utils.getBaseName(filePath));
+    getAnalisysContext(filePath);
   } else {
     await analyzeWorkspace();
   }
