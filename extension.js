@@ -46,26 +46,24 @@ async function analyzeFile(fileDirectory, baseName) {
   const terminal = vscode.window.createTerminal('Myth: Analyze File');
   let command;
 
-  //FIXME stampare output dentro un markdown SOLO se il processo va a buon fine
   if (executionMode === 'docker') {
-    //FIXME rimuovere il container docker dopo l'utilizzo, deve essere 'usa e getta'
-    command = `docker run -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout}`;
+    command = `docker run --rm -v ${fileDirectory}:/tmp mythril/myth analyze /tmp/${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}-output.md`;
   } else {
-    command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout}`;
+    command = `myth analyze ./${baseName} -o markdown --execution-timeout ${executionTimeout} > ./${baseName}-output.md`;
   }
   
   terminal.show();
-  //TODO controllare il testo del report
   terminal.sendText(command);
 }
 
+//[IMPLEMENT] keybinding
 //TODO deve diventare funzione di utility
 function getActiveTextEditorFilePath() {
   const editor = vscode.window.activeTextEditor;
   return editor ? editor.document.fileName : undefined;
 }
 
-//TODO [debug]: vedere quando e SE è chiamata
+//[DEBUG]: vedere quando e SE è chiamata
 async function promptForAnalysis() {
   const options = { filters: { 'Solidity Files': ['sol'] } };
   const selectedFileUri = await vscode.window.showOpenDialog(options);
