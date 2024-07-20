@@ -11,11 +11,6 @@ async function analyzeCommand(fileUri) {
   try {
     const filePath = fileUri ? fileUri.fsPath : getActiveTextEditorFilePath();
 
-    if (!filePath) {
-     // await promptForAnalysis();
-      return;
-    }
-
     if (!utils.isSolidityFile(filePath)) {
       throw new Error('This command is only available for Solidity files (.sol).');
     }
@@ -25,7 +20,6 @@ async function analyzeCommand(fileUri) {
     vscode.window.showErrorMessage(error.message);
   }
 }
-
 
 function deactivate() {}
 
@@ -42,8 +36,10 @@ async function analyzeFile(fileDirectory, baseName) {
   const executionMode = mythrilVscConfig.get('executionMode', 'docker');
 
 
-  //TODO creare funzione di utility per decidere che comando lanciare
-  const terminal = vscode.window.createTerminal('Myth: Analyze File');
+//TODO creare funzione di utility per decidere che comando lanciare
+//[IMPLEMENT] apertura automatica dell'output.md
+
+  const terminal = vscode.window.createTerminal({ name:'Myth: Analyze File', message: `*** Mythril: starting analysis for ${baseName}... ***` });
   let command;
 
   if (executionMode === 'docker') {
@@ -54,25 +50,13 @@ async function analyzeFile(fileDirectory, baseName) {
   
   terminal.show();
   terminal.sendText(command);
-}
+  }
 
 //[IMPLEMENT] keybinding
 //TODO deve diventare funzione di utility
 function getActiveTextEditorFilePath() {
   const editor = vscode.window.activeTextEditor;
   return editor ? editor.document.fileName : undefined;
-}
-
-//[DEBUG]: vedere quando e SE è chiamata
-async function promptForAnalysis() {
-  const options = { filters: { 'Solidity Files': ['sol'] } };
-  const selectedFileUri = await vscode.window.showOpenDialog(options);
-
-  if (selectedFileUri && selectedFileUri[0].fsPath) {
-    const filePath = selectedFileUri[0].fsPath;
-
-    getAnalisysContext(filePath);
-  }
 }
 
 module.exports = {
