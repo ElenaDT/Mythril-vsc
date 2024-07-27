@@ -12,7 +12,7 @@ function analyzeCommand(fileUri) {
   const {command, outputPath} = utils.getCommand(baseName, fileDir, execTimeout, execMode);
   
   if (utils.isSolidityFile(filePath)) {
-    utils.launchCommand(baseName, command, outputPath);
+    utils.launchCommand(baseName, fileDir, command, outputPath);
   } else {
     throw new Error('This command is only available for Solidity files (.sol).'); 
   };

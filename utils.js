@@ -35,7 +35,8 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
   return { command, outputPath };
 }
 
-function launchCommand(baseName, command, outputPath) {
+function launchCommand(baseName, fileDir, command, outputPath) {
+  const fullFilePath= `${fileDir}/${baseName}-output.md`;
   const terminal = vscode.window.createTerminal({
     name:  `myth analyze: ${baseName}`, 
     message: `*** Mythril: starting analysis for ${baseName}... ***`
@@ -43,12 +44,13 @@ function launchCommand(baseName, command, outputPath) {
 
   terminal.sendText(command);
   terminal.show();
-  terminal.sendText(`code ${outputPath}\nexit`);
+  terminal.sendText(`exit`);
 
   vscode.window.onDidCloseTerminal((terminal) => {
-    if (terminal.name === `myth analyze: ${baseName}`) {
+    if (terminal.name === `myth analyze: ${baseName}` && terminal.exitStatus.code === 0) {
       vscode.window.showInformationMessage(`Myth: output saved in ${outputPath}.`);
-    }
+      vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullFilePath));
+    } 
   });
 };
 
