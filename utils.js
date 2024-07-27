@@ -24,36 +24,27 @@ function isSolidityFile(filePath) {
 }
 
 function getCommand(baseName, fileDir, execTimeout, execMode){
-  let command = `-o markdown --execution-timeout ${execTimeout}`;
+  const outputPath = `./${baseName}-output.md`;  
+  let command = `-o markdown --execution-timeout ${execTimeout} > ${outputPath}`;
 
   if (execMode === 'docker') {
     command = `docker run --rm -v ${fileDir}:/tmp mythril/myth analyze /tmp/${baseName} ${command}`;
   } else {
     command = `myth analyze ./${baseName} ${command}`;
   }
-  return command;
+  return { command, outputPath };
 }
 
-//[IMPLEMENT] apertura automatica dell'output.md
-
-function launchCommand(baseName, command) {
-  const outputPath = `./${baseName}-output.md`;
-  const child = spawn(command, { shell: true });
-
-  child.stdout.on('data', (data) => {
-    fs.appendFileSync(outputPath, data.toString());
+function launchCommand(baseName, command, outputPath) {
+  const terminal = vscode.window.createTerminal({
+    name:  `myth analyze: ${baseName}`, 
+    message: `*** Mythril: starting analysis for ${baseName}... ***`
   });
 
-  child.stderr.on('data', (data) => {
-    vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
-  });
-
-  child.on('close', (code) => {
-    if (code === 0) {
-      vscode.window.showInformationMessage(`Myth: Output saved in ${outputPath}`);
-    }
-  });
-}
+  terminal.sendText(command);
+  terminal.show();
+  terminal.sendText(`code ${outputPath}\nexit`);
+};
 
 module.exports = {
   getFileContext,
