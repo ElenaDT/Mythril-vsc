@@ -34,10 +34,7 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
 }
 
 //[IMPLEMENT] apertura automatica dell'output.md
-function launchCommand(baseName, fileDir, execTimeout, execMode){
-
-  const command = getCommand(baseName, fileDir, execTimeout, execMode);
-  
+function launchCommand(baseName, command){
   const terminal = vscode.window.createTerminal({
     name:'Myth: Analyze File',
     message: `*** Mythril: starting analysis for ${baseName}... ***`
@@ -45,6 +42,7 @@ function launchCommand(baseName, fileDir, execTimeout, execMode){
 
   terminal.show();
   terminal.sendText(command);
+  terminal.sendText('exit');
 }
 
 module.exports = {
@@ -52,4 +50,5 @@ module.exports = {
   isSolidityFile,
   launchCommand,
   getActiveEditorFilePath,
+  getCommand
 };

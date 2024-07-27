@@ -9,15 +9,14 @@ function activate(context) {
 function analyzeCommand(fileUri) {
   const filePath = fileUri ? fileUri.fsPath : utils.getActiveEditorFilePath();
   const {baseName, fileDir, execTimeout, execMode} = utils.getFileContext(filePath);
+  const command = utils.getCommand(baseName, fileDir, execTimeout, execMode);
   
-  try {
-    if (!utils.isSolidityFile(filePath)) {
-      throw new Error('This command is only available for Solidity files (.sol).');
-    }
-    utils.launchCommand(baseName, fileDir, execTimeout, execMode);
-  } catch (e) {
-    vscode.window.showErrorMessage(e.message);
-  }
+  if (utils.isSolidityFile(filePath)) {
+    utils.launchCommand(baseName, command);
+    //vscode.window.showInformationMessage(`Myth: output saved in ./${baseName}-output.md.`);
+  } else {
+    throw new Error('This command is only available for Solidity files (.sol).'); 
+  };
 }
 
 module.exports = {
