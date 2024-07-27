@@ -47,3 +47,4 @@ out/
 # Altro
 .DS_Store
 Thumbs.db
+eslint.config.mjs
