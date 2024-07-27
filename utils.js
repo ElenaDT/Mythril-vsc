@@ -4,6 +4,7 @@ const path = require('path');
 function getFileContext(filePath) {
   const mythVscConfig = vscode.workspace.getConfiguration('mythril-vsc'); 
   const baseName = vscode.workspace.asRelativePath(filePath); 
+  // TODO vedere le API di VSC per la path
   const fileDir = path.dirname(filePath);
   const execTimeout = mythVscConfig.get('executionTimeout', 60);
   const execMode = mythVscConfig.get('executionMode', 'docker');
@@ -11,7 +12,6 @@ function getFileContext(filePath) {
   return { baseName, fileDir, execTimeout, execMode };
   };
 
-  //[IMPLEMENT] keybinding
   function getActiveEditorFilePath() {
     const editor = vscode.window.activeTextEditor;
     return editor ? editor.document.fileName : undefined;
@@ -23,7 +23,8 @@ function isSolidityFile(filePath) {
 
 //[IMPLEMENT] apertura automatica dell'output.md
 function launchCommand(baseName, fileDir, execTimeout, execMode){
-  let command = `-o markdown --execution-timeout ${execTimeout} > ./${baseName}-output.md`;
+  const outputFile = `./${baseName}-output.md`;
+  let command = `-o markdown --execution-timeout ${execTimeout} > ${outputFile}`;
   
   const terminal = vscode.window.createTerminal({
     name:'Myth: Analyze File',
