@@ -21,22 +21,28 @@ function isSolidityFile(filePath) {
   return path.extname(filePath).toLowerCase() === '.sol';
 }
 
-//[IMPLEMENT] apertura automatica dell'output.md
-function launchCommand(baseName, fileDir, execTimeout, execMode){
+function getCommand(baseName, fileDir, execTimeout, execMode){
   const outputFile = `./${baseName}-output.md`;
   let command = `-o markdown --execution-timeout ${execTimeout} > ${outputFile}`;
-  
-  const terminal = vscode.window.createTerminal({
-    name:'Myth: Analyze File',
-    message: `*** Mythril: starting analysis for ${baseName}... ***`
-  });
 
   if (execMode === 'docker') {
     command = `docker run --rm -v ${fileDir}:/tmp mythril/myth analyze /tmp/${baseName} ${command}`;
   } else {
     command = `myth analyze ./${baseName} ${command}`;
   }
+  return command;
+}
+
+//[IMPLEMENT] apertura automatica dell'output.md
+function launchCommand(baseName, fileDir, execTimeout, execMode){
+
+  const command = getCommand(baseName, fileDir, execTimeout, execMode);
   
+  const terminal = vscode.window.createTerminal({
+    name:'Myth: Analyze File',
+    message: `*** Mythril: starting analysis for ${baseName}... ***`
+  });
+
   terminal.show();
   terminal.sendText(command);
 }
