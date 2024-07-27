@@ -34,24 +34,45 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
   return command;
 }
 
-//[IMPLEMENT] apertura automatica dell'output.md
+//FIXME il messaggio di errore non riconosce il nome del file...
+//TODO semplifica sintassi e vedere se il codice asincrono è necessario!!!
+//TODO chiudere i messaggi di errore/info dopo tot secondi...
+//[DEBUG] testare con linux nativo
+//[IMPLEMENT] processing info
+//IMPLEMENT keybinding per analyze
 
-function launchCommand(baseName, command) {
+async function launchCommand(baseName, fileDir, command) {
+  console.log('*** analysis started ***')
   const outputPath = `./${baseName}-output.md`;
-  const child = spawn(command, { shell: true });
+  const fullPath =  `${fileDir}/${baseName}-output.md`;
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, { shell: true });
 
-  child.stdout.on('data', (data) => {
-    fs.appendFileSync(outputPath, data.toString());
-  });
+    child.stdout.on('data', (data) => {
+      fs.appendFile(fullPath, data.toString(), (err) => {
+        if (err) {
+          reject(err);
+        }
+      });
+    });
 
-  child.stderr.on('data', (data) => {
-    vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
-  });
+    child.stderr.on('data', (data) => {
+      vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
+    });
 
-  child.on('close', (code) => {
-    if (code === 0) {
-      vscode.window.showInformationMessage(`Myth: Output saved in ${outputPath}`);
-    }
+    child.on('close', (code) => {
+      if (code === 0) {
+        vscode.window.showInformationMessage(`Myth: Output saved in ${outputPath}`);
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
+        resolve();
+      } else {
+        reject(new Error(`Command exited with code ${code}`));
+      }
+    });
+
+    child.on('error', (err) => {
+      reject(err);
+    });
   });
 }
 
