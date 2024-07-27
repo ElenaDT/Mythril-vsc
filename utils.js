@@ -44,6 +44,12 @@ function launchCommand(baseName, command, outputPath) {
   terminal.sendText(command);
   terminal.show();
   terminal.sendText(`code ${outputPath}\nexit`);
+
+  vscode.window.onDidCloseTerminal((terminal) => {
+    if (terminal.name === `myth analyze: ${baseName}`) {
+      vscode.window.showInformationMessage(`Myth: output saved in ${outputPath}.`);
+    }
+  });
 };
 
 module.exports = {
