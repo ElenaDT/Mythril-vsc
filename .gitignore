@@ -48,3 +48,4 @@ out/
 .DS_Store
 Thumbs.db
 eslint.config.mjs
+.solcx-lock-*
