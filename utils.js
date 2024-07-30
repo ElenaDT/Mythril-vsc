@@ -36,9 +36,8 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
 
 //TODO semplifica sintassi e vedere se il codice asincrono è necessario!!!
 //[DEBUG] testare con linux nativo
-//[IMPLEMENT] processing info
-//IMPLEMENT keybinding per analyze
-
+//[IMPLEMENT] keybinding per analyze
+//TODO valutare se spostare la launchCommand nel file principale...
 async function launchCommand(baseName, fileDir, command, execTimeout) {
   const outputPath = `./${baseName}-output.md`;
   showProgress(execTimeout, outputPath);
