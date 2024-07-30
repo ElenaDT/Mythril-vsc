@@ -8,7 +8,7 @@ function getFileContext(filePath) {
   const baseName = vscode.workspace.asRelativePath(filePath); 
   // TODO vedere le API di VSC per la path
   const fileDir = path.dirname(filePath);
-  const execTimeout = mythVscConfig.get('executionTimeout', 60);
+  var execTimeout = mythVscConfig.get('executionTimeout', 60);
   const execMode = mythVscConfig.get('executionMode', 'docker');
 
   return { baseName, fileDir, execTimeout, execMode };
@@ -35,14 +35,13 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
 }
 
 //TODO semplifica sintassi e vedere se il codice asincrono è necessario!!!
-//TODO chiudere i messaggi di errore/info dopo tot secondi...
 //[DEBUG] testare con linux nativo
 //[IMPLEMENT] processing info
 //IMPLEMENT keybinding per analyze
 
-async function launchCommand(baseName, fileDir, command) {
-  console.log('*** analysis started ***')
+async function launchCommand(baseName, fileDir, command, execTimeout) {
   const outputPath = `./${baseName}-output.md`;
+  showProgress(execTimeout, outputPath);
   const fullPath =  `${fileDir}/${baseName}-output.md`;
   return new Promise((resolve, reject) => {
     const child = spawn(command, { shell: true });
@@ -60,7 +59,6 @@ async function launchCommand(baseName, fileDir, command) {
     });
 
     child.on('close', () => {
-        vscode.window.showInformationMessage(`Myth: Output saved in ${outputPath}`);
         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
         resolve();
     });
@@ -70,6 +68,38 @@ async function launchCommand(baseName, fileDir, command) {
     });
   });
 }
+
+function showProgress(execTimeout, outputPath) {
+  const msExecTimeout = execTimeout * 1000;
+
+  vscode.window.withProgress({
+    location: vscode.ProgressLocation.Notification,
+    title: "Operazione in corso...",
+    cancellable: false
+  }, (progress) => {
+    progress.report({ increment: 0, message: "Inizio..." });
+
+    setTimeout(() => {
+      progress.report({ increment: 10, message: "Operazione in corso - ancora un po'..." });
+    }, msExecTimeout * 0.1); 
+
+    setTimeout(() => {
+      progress.report({ increment: 30, message: "Operazione in corso - quasi a metà..." });
+    }, msExecTimeout * 0.4);
+    setTimeout(() => {
+      progress.report({ increment: 30, message: "Operazione in corso - ci siamo quasi..." });
+    }, msExecTimeout * 0.7); 
+
+    const p = new Promise(resolve => {
+      setTimeout(() => {
+        progress.report({ increment: 30, message: `Myth: Output saved in ${outputPath}`});
+        resolve();
+      }, msExecTimeout + 1000); 
+
+    return p;
+    });
+  });
+}  
 
 module.exports = {
   getFileContext,
