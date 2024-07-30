@@ -34,7 +34,6 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
   return command;
 }
 
-//FIXME il messaggio di errore non riconosce il nome del file...
 //TODO semplifica sintassi e vedere se il codice asincrono è necessario!!!
 //TODO chiudere i messaggi di errore/info dopo tot secondi...
 //[DEBUG] testare con linux nativo
@@ -60,14 +59,10 @@ async function launchCommand(baseName, fileDir, command) {
       vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
     });
 
-    child.on('close', (code) => {
-      if (code === 0) {
+    child.on('close', () => {
         vscode.window.showInformationMessage(`Myth: Output saved in ${outputPath}`);
         vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
         resolve();
-      } else {
-        reject(new Error(`Command exited with code ${code}`));
-      }
     });
 
     child.on('error', (err) => {
