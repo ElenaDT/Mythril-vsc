@@ -8,7 +8,7 @@ function getFileContext(filePath) {
   const baseName = vscode.workspace.asRelativePath(filePath); 
   // TODO vedere le API di VSC per la path
   const fileDir = path.dirname(filePath);
-  var execTimeout = mythVscConfig.get('executionTimeout', 60);
+  const execTimeout = mythVscConfig.get('executionTimeout', 60);
   const execMode = mythVscConfig.get('executionMode', 'docker');
 
   return { baseName, fileDir, execTimeout, execMode };
@@ -89,14 +89,13 @@ function showProgress(execTimeout, outputPath) {
       progress.report({ increment: 30, message: "Operazione in corso - ci siamo quasi..." });
     }, msExecTimeout * 0.7); 
 
-    const p = new Promise(resolve => {
+  
       setTimeout(() => {
         progress.report({ increment: 30, message: `Myth: Output saved in ${outputPath}`});
-        resolve();
-      }, msExecTimeout + 1000); 
+      
+      }, msExecTimeout + 2000); 
 
-    return p;
-    });
+    
   });
 }  
 
