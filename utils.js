@@ -46,7 +46,7 @@ async function launchCommand(baseName, fileDir, command) {
   await vscode.window.withProgress(
     {
       location: progressLocation,
-      title: 'Esecuzione comando in corso...',
+      title: 'Analyzing contract...',
       cancellable: true,
     },
     async (progress, token) => {
@@ -56,9 +56,9 @@ async function launchCommand(baseName, fileDir, command) {
 
         token.onCancellationRequested(() => {
           isCancelled = true;
-          vscode.window.showInformationMessage('Myth: analysis cancelled.'); // Corretto il nome della funzione
+          vscode.window.showInformationMessage('Myth: analysis cancelled.'); 
           child.kill();
-          reject(new Error('Myth: analysis cancelled.')); // Rifiuta la Promise
+          reject(new Error('Myth: analysis cancelled.'));
         });
 
         child.stdout.on('data', (data) => {
@@ -67,12 +67,10 @@ async function launchCommand(baseName, fileDir, command) {
               reject(err);
             }
           });
-
-          progress.report({ message: 'Analyzing...', increment: data.length });
         });
 
         child.stderr.on('data', (data) => {
-          vscode.window.showErrorMessage(`Myth: Err: ${data.toString()}`);
+          vscode.window.showErrorMessage(`Myth: ERROR: ${data.toString()}`);
         });
 
         child.on('close', () => {
