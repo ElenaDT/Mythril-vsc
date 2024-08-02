@@ -38,80 +38,63 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
 //[DEBUG] testare con linux nativo
 //[IMPLEMENT] keybinding per analyze
 //TODO valutare se spostare la launchCommand nel file principale...
-async function launchCommand(baseName, fileDir, command, execTimeout) {
-  const outputPath = `./${baseName}-output.md`;
-  showProgress(execTimeout, outputPath);
-  const fullPath =  `${fileDir}/${baseName}-output.md`;
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, { shell: true });
+async function launchCommand(baseName, fileDir, command) {
+  const fullPath = `${fileDir}/${baseName}-output.md`;
 
-    child.stdout.on('data', (data) => {
-      fs.appendFile(fullPath, data.toString(), (err) => {
-        if (err) {
+  // Crea un nuovo ProgressLocation
+  const progressLocation = vscode.ProgressLocation.Notification;
+
+  await vscode.window.withProgress(
+    {
+      location: progressLocation,
+      title: 'Esecuzione comando in corso...',
+      cancellable: true,
+    },
+    async (progress, token) => {
+      return new Promise((resolve, reject) => {
+        const child = spawn(command, { shell: true });
+        let isCancelled = false;
+
+        // Gestione della cancellazione
+        token.onCancellationRequested(() => {
+          isCancelled = true;
+          child.kill(); // Termina il processo figlio
+          vscode.window.showInformationMessage('Esecuzione comando annullata.');
+          reject(new Error('Esecuzione comando annullata.'));
+        });
+
+        child.stdout.on('data', (data) => {
+          fs.appendFile(fullPath, data.toString(), (err) => {
+            if (err) {
+              reject(err);
+            }
+          });
+
+          // Aggiorna il progress reporting senza incrementare percentuale
+          progress.report({ message: 'Elaborazione in corso...', increment: 0 });
+        });
+
+        child.stderr.on('data', (data) => {
+          vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
+        });
+
+        child.on('close', () => {
+          if (!isCancelled) {
+            vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
+            resolve();
+          }
+        });
+
+        child.on('error', (err) => {
           reject(err);
-        }
+        });
       });
-    });
-
-    child.stderr.on('data', (data) => {
-      vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
-    });
-
-    child.on('close', () => {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
-        resolve();
-    });
-
-    child.on('error', (err) => {
-      reject(err);
-    });
-  });
+    }
+  );
 }
 
-// FIXME riparte lo starting
-// FIXME deve terminare un po' dopo
-// FIXME la barra non procede graficamente
-// FIXME finestra non si chiude o non si può chuidere in alcun modo
 // BUG in caso di errore del processo di lanchcommand deve chiudersi da sola
 // [IMPLEMENT] deve essere cancellabile
-
-async function showProgress(execTimeout, outputPath) {
-  const msExecTimeout = execTimeout * 1000;
-
-  return new Promise((resolve) => {
-    let analysisFinished = false;
-
-    vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title: "Myth Analyze",
-      cancellable: false
-    }, (progress) => {
-      let messageIndex = 0;
-      const messages = [
-        "Starting...",
-        "almost there...",
-        "almost halfway...",
-        "almost there...",
-        `output saved in ${outputPath}`
-      ];
-
-      const intervalId = setInterval(() => {
-        if (!analysisFinished) {
-          progress.report({ increment: 0, message: messages[messageIndex] });
-          messageIndex = (messageIndex + 1) % messages.length;
-        }
-      }, msExecTimeout * 0.1);
-
-      setTimeout(() => {
-        analysisFinished = true;
-        clearInterval(intervalId);
-        progress.report({ increment: 30, message: `Myth: Analysis complete` });
-        resolve();
-      }, msExecTimeout + 2000);
-    });
-  });
-}
-
 module.exports = {
   getFileContext,
   isSolidityFile,
