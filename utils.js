@@ -68,36 +68,49 @@ async function launchCommand(baseName, fileDir, command, execTimeout) {
   });
 }
 
-function showProgress(execTimeout, outputPath) {
+// FIXME riparte lo starting
+// FIXME deve terminare un po' dopo
+// FIXME la barra non procede graficamente
+// FIXME finestra non si chiude o non si può chuidere in alcun modo
+// BUG in caso di errore del processo di lanchcommand deve chiudersi da sola
+// [IMPLEMENT] deve essere cancellabile
+
+async function showProgress(execTimeout, outputPath) {
   const msExecTimeout = execTimeout * 1000;
 
-  vscode.window.withProgress({
-    location: vscode.ProgressLocation.Notification,
-    title: "Operazione in corso...",
-    cancellable: false
-  }, (progress) => {
-    progress.report({ increment: 0, message: "Inizio..." });
+  return new Promise((resolve) => {
+    let analysisFinished = false;
 
-    setTimeout(() => {
-      progress.report({ increment: 10, message: "Operazione in corso - ancora un po'..." });
-    }, msExecTimeout * 0.1); 
+    vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: "Myth Analyze",
+      cancellable: false
+    }, (progress) => {
+      let messageIndex = 0;
+      const messages = [
+        "Starting...",
+        "almost there...",
+        "almost halfway...",
+        "almost there...",
+        `output saved in ${outputPath}`
+      ];
 
-    setTimeout(() => {
-      progress.report({ increment: 30, message: "Operazione in corso - quasi a metà..." });
-    }, msExecTimeout * 0.4);
-    setTimeout(() => {
-      progress.report({ increment: 30, message: "Operazione in corso - ci siamo quasi..." });
-    }, msExecTimeout * 0.7); 
+      const intervalId = setInterval(() => {
+        if (!analysisFinished) {
+          progress.report({ increment: 0, message: messages[messageIndex] });
+          messageIndex = (messageIndex + 1) % messages.length;
+        }
+      }, msExecTimeout * 0.1);
 
-  
       setTimeout(() => {
-        progress.report({ increment: 30, message: `Myth: Output saved in ${outputPath}`});
-      
-      }, msExecTimeout + 2000); 
-
-    
+        analysisFinished = true;
+        clearInterval(intervalId);
+        progress.report({ increment: 30, message: `Myth: Analysis complete` });
+        resolve();
+      }, msExecTimeout + 2000);
+    });
   });
-}  
+}
 
 module.exports = {
   getFileContext,
