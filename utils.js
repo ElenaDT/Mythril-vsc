@@ -34,14 +34,13 @@ function getCommand(baseName, fileDir, execTimeout, execMode){
   return command;
 }
 
-//TODO semplifica sintassi e vedere se il codice asincrono è necessario!!!
+//TODO semplifica sintassi
 //[DEBUG] testare con linux nativo
 //[IMPLEMENT] keybinding per analyze
 //TODO valutare se spostare la launchCommand nel file principale...
+
 async function launchCommand(baseName, fileDir, command) {
   const fullPath = `${fileDir}/${baseName}-output.md`;
-
-  // Crea un nuovo ProgressLocation
   const progressLocation = vscode.ProgressLocation.Notification;
 
   await vscode.window.withProgress(
@@ -55,12 +54,11 @@ async function launchCommand(baseName, fileDir, command) {
         const child = spawn(command, { shell: true });
         let isCancelled = false;
 
-        // Gestione della cancellazione
         token.onCancellationRequested(() => {
           isCancelled = true;
-          child.kill(); // Termina il processo figlio
-          vscode.window.showInformationMessage('Esecuzione comando annullata.');
-          reject(new Error('Esecuzione comando annullata.'));
+          vscode.window.showInformationMessage('Myth: analysis cancelled.'); // Corretto il nome della funzione
+          child.kill();
+          reject(new Error('Myth: analysis cancelled.')); // Rifiuta la Promise
         });
 
         child.stdout.on('data', (data) => {
@@ -70,12 +68,11 @@ async function launchCommand(baseName, fileDir, command) {
             }
           });
 
-          // Aggiorna il progress reporting senza incrementare percentuale
-          progress.report({ message: 'Elaborazione in corso...', increment: 0 });
+          progress.report({ message: 'Analyzing...', increment: data.length });
         });
 
         child.stderr.on('data', (data) => {
-          vscode.window.showErrorMessage(`Myth: Errore: ${data.toString()}`);
+          vscode.window.showErrorMessage(`Myth: Err: ${data.toString()}`);
         });
 
         child.on('close', () => {
@@ -93,8 +90,7 @@ async function launchCommand(baseName, fileDir, command) {
   );
 }
 
-// BUG in caso di errore del processo di lanchcommand deve chiudersi da sola
-// [IMPLEMENT] deve essere cancellabile
+
 module.exports = {
   getFileContext,
   isSolidityFile,
