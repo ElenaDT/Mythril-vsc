@@ -25,7 +25,8 @@ function analyzeCommand(fileUri) {
 
 // [IMPLEMENT] keybinding per analyze
 // [DEBUG] testare con linux nativo
-// TODO migliora icona
+// TODO fix nuova icona con SVG editor
+// TODO sostituire con nuova icona in versione light e dark
 
 async function launchCommand(baseName, fileDir, command) {
   const fullPath = `${fileDir}/${baseName}-output.md`;
