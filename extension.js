@@ -20,6 +20,7 @@ function analyzeCommand(fileUri) {
   };
 }
 
+// TODO implementa fx di utility x lancher una alla volta
 // [IMPLEMENT] comando per contratti con import per openZeppelin
 // [IMPLEMENT] considera execTimeout
 
