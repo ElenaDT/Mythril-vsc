@@ -12,25 +12,28 @@ function activate(context) {
 
 function analyzeCommand(fileUri) {
   const filePath = fileUri ? fileUri.fsPath : utils.getActiveEditorFilePath();
-  const {baseName, fileDir, execTimeout, execMode} = utils.getFileContext(filePath);
-  const command = utils.getCommand(baseName, fileDir, execTimeout, execMode);
+  const {baseName, fileDir, projectDir, execTimeout, useOpenZeppelin} = utils.getFileContext(filePath);
+  const command = utils.getCommand(baseName, fileDir, projectDir, execTimeout, useOpenZeppelin);
   
   if (utils.isSolidityFile(filePath)) {
-    launchCommand(baseName, fileDir, command, execTimeout);
+    launchCommand(baseName, fileDir, command);
   } else {
     throw new Error('This command is only available for Solidity files (.sol).'); 
   };
 }
 
-// [IMPLEMENT] comando per contratti con import per openZeppelin
-// [IMPLEMENT] supporto config per scelto output json
-// TODO considera execTimeout
-
+// [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
+// [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
+// FIXME icone e container rimovibile
+// FIXME il file .md non esiste non bisogna aprirlo
+// TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
+/* TODO spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
+   e specificare che deve essere mappato così:'@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/' */
+// TODO aggiornare README e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth
 // [IMPLEMENT] keybinding per analyze
-// [DEBUG] testare con linux nativo
-// TODO migliora icona
+// TODO migliorare icona
 
-async function launchCommand(baseName, fileDir, command, execTimeout) {
+async function launchCommand(baseName, fileDir, command) {
   const fullPath = `${fileDir}/${baseName}-output.md`;
   const progressLocation = vscode.ProgressLocation.Notification;
 
@@ -83,4 +86,5 @@ module.exports = {
   activate,
   deactivate: () => {}
 };
+
 

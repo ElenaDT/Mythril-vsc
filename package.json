@@ -16,15 +16,15 @@
   "activationEvents": [
     "onCommand:extension.mythril-vsc.analyze"
   ],
-  "main": "./extension.js",
+  "main": "./src/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "mythril-vsc.analyze",
         "title": "Mythril-VSC: Analyze File",
         "icon": {
-          "light": "mythril-audit-light.svg",
-          "dark": "mythril-audit-dark.svg"
+          "light": "./src/images/mythril-audit-light.svg",
+          "dark": "./src/images/mythril-audit-dark.svg"
         }
       }
     ],
@@ -53,18 +53,10 @@
           "default": 30,
           "description": "The execution timeout in seconds for Mythril analysis."
         },
-        "mythril-vsc.executionMode": {
-          "type": "string",
-          "default": "local",
-          "enum": [
-            "docker",
-            "local"
-          ],
-          "enumDescriptions": [
-            "Use Docker for Mythril analysis",
-            "Use locally installed Mythril"
-          ],
-          "markdownDescription": "Choose the execution mode for Mythril analysis."
+        "mythril-vsc.useOpenZeppelin": {
+        "type": "boolean",
+        "default": true,
+        "markdownDescription": "Choose whether to import OpenZeppelin contracts for Mythril analysis."
         }
       }
     }
