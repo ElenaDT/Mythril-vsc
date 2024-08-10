@@ -22,16 +22,21 @@ function analyzeCommand(fileUri) {
   };
 }
 
+// TODO container rimovibile
+// BUG impossibile cambiare le impostazioni, fs di sola lettura!
 // [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
 // [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
-// FIXME icone e container rimovibile
-// FIXME il file .md non esiste non bisogna aprirlo
-// TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
-/* TODO spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
-   e specificare che deve essere mappato così:'@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/' */
-// TODO aggiornare README e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth
 // [IMPLEMENT] keybinding per analyze
-// TODO migliorare icona
+
+// FIXME il menù a tendina del fs mostra il comando 'Analyze' anche per file non '*.sol'
+// FIXME icone
+// FIXME il file .md non esiste (cioè in caso di errore) non bisogna tentare di aprirlo
+
+// TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
+// TODO spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
+// TODO specificare che deve essere mappato così:'@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/'
+// TODO aggiornare README e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth :)
+// TODO migliorare icona ...
 
 async function launchCommand(baseName, fileDir, command) {
   const fullPath = `${fileDir}/${baseName}-output.md`;

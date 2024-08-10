@@ -50,7 +50,7 @@
       "properties": {
         "mythril-vsc.executionTimeout": {
           "type": "number",
-          "default": 30,
+          "default": 60,
           "description": "The execution timeout in seconds for Mythril analysis."
         },
         "mythril-vsc.useOpenZeppelin": {
