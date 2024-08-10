@@ -5,8 +5,7 @@ const path = require('path');
 
 function getFileContext(filePath) {
   const mythVscConfig = vscode.workspace.getConfiguration('mythril-vsc'); 
-  const baseName = vscode.workspace.asRelativePath(filePath); 
-  // TODO vedere le API di VSC per la path
+  const baseName = path.basename(filePath);
   const fileDir = path.dirname(filePath);
   const execTimeout = mythVscConfig.get('executionTimeout', 60);
   const execMode = mythVscConfig.get('executionMode', 'docker');
