@@ -81,7 +81,7 @@
     "@types/vscode": "^1.89.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.3.9",
-    "eslint": "^9.8.0",
+    "eslint": "^9.9.0",
     "globals": "^15.8.0",
     "typescript": "^5.4.5"
   }

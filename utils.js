@@ -1,3 +1,5 @@
+'use strict';
+
 const vscode = require('vscode');
 const path = require('path');
 
@@ -10,12 +12,12 @@ function getFileContext(filePath) {
   const execMode = mythVscConfig.get('executionMode', 'docker');
 
   return { baseName, fileDir, execTimeout, execMode };
-  };
+};
 
-  function getActiveEditorFilePath() {
-    const editor = vscode.window.activeTextEditor;
-    return editor ? editor.document.fileName : undefined;
-  }
+function getActiveEditorFilePath() {
+  const editor = vscode.window.activeTextEditor;
+  return editor ? editor.document.fileName : undefined;
+}
 
 function isSolidityFile(filePath) {
   return path.extname(filePath).toLowerCase() === '.sol';

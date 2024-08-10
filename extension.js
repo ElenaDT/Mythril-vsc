@@ -1,3 +1,5 @@
+'use strict';
+
 const vscode = require('vscode');
 const utils = require('./utils.js');
 const { spawn } = require('child_process');
@@ -20,7 +22,6 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// TODO implementa fx di utility x lancher una alla volta
 // [IMPLEMENT] comando per contratti con import per openZeppelin
 // [IMPLEMENT] considera execTimeout
 
@@ -28,7 +29,7 @@ function analyzeCommand(fileUri) {
 // [DEBUG] testare con linux nativo
 // TODO migliora icona
 
-async function launchCommand(baseName, fileDir, command) {
+async function launchCommand(baseName, fileDir, command, execTimeout) {
   const fullPath = `${fileDir}/${baseName}-output.md`;
   const progressLocation = vscode.ProgressLocation.Notification;
 
@@ -81,3 +82,4 @@ module.exports = {
   activate,
   deactivate: () => {}
 };
+
