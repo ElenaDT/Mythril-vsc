@@ -23,7 +23,8 @@ function analyzeCommand(fileUri) {
 }
 
 // [IMPLEMENT] comando per contratti con import per openZeppelin
-// [IMPLEMENT] considera execTimeout
+// [IMPLEMENT] supporto config per scelto output json
+// TODO considera execTimeout
 
 // [IMPLEMENT] keybinding per analyze
 // [DEBUG] testare con linux nativo
