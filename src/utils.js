@@ -23,10 +23,6 @@ function isSolidityFile(filePath) {
   return path.extname(filePath).toLowerCase() === '.sol';
 }
 
-/* 
-docker run -v c:\\Users\\elena\\OneDrive\\Desktop\\Test_project:/tmp mythril/myth analyze /tmp/solidity_examples/vunlnerableToken.sol
- --solc-json=/tmp/solidity_examples/solc-args.json --solv 0.8.20 -o markdown
-*/
 function getCommand(baseName, fileDir, projectDir, execTimeout, useOpenZeppelin){
   let vol = `-v ${projectDir}/contracts:/tmp/contracts`;
   const oZlib = ` -v ${projectDir}/node_modules/@openzeppelin/contracts:/tmp/node_modules/@openzeppelin/contracts`;
@@ -36,16 +32,29 @@ function getCommand(baseName, fileDir, projectDir, execTimeout, useOpenZeppelin)
     vol += oZlib;
   }
   
-  const args = `--solc-json=/tmp/contracts/solc-args.json --solv 0.8.20 -o markdown --execution-timeout ${execTimeout}`;
-  const command = `docker run --rm ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${args}`;
+  const mythArgs = `--solc-json=/tmp/contracts/solc-args.json --solv 0.8.20 -o markdown --execution-timeout ${execTimeout}`;
+  const command = `docker run --name "Mythril_Analysis" --rm ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${mythArgs}`;
 
   return command;
+}
+
+function stopDockerContainer() {
+  return new Promise((resolve, reject) => {
+    const { exec } = require('child_process');
+    exec('docker stop Mythril_Analysis', (error, stdout, stderr) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(stdout);
+    });
+  });
 }
 
 module.exports = {
   getFileContext,
   isSolidityFile,
   getActiveEditorFilePath,
-  getCommand
+  getCommand,
+  stopDockerContainer
 };
 

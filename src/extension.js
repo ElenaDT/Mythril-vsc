@@ -22,7 +22,6 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// TODO stop container al cancel dell'utente
 // [IMPLEMENT] aggiornamento settings
 // [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
 // [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
@@ -55,8 +54,13 @@ async function launchCommand(baseName, fileDir, command) {
         token.onCancellationRequested(() => {
           isCancelled = true;
           vscode.window.showInformationMessage('Myth: analysis cancelled.'); 
-          child.kill();
-          reject(new Error('Myth: analysis cancelled.'));
+          try {
+            utils.stopDockerContainer();
+            child.kill();
+            reject(new Error('Myth: analysis cancelled.'));
+          } catch (error) {
+            vscode.window.showErrorMessage(`Error stopping Docker container: ${error.message}`);
+          }
         });
 
         child.stdout.on('data', (data) => {
