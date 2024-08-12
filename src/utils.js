@@ -37,7 +37,7 @@ function getCommand(baseName, fileDir, projectDir, execTimeout, useOpenZeppelin)
   }
   
   const args = `--solc-json=/tmp/contracts/solc-args.json --solv 0.8.20 -o markdown --execution-timeout ${execTimeout}`;
-  const command = `docker run ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${args}`;
+  const command = `docker run --rm ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${args}`;
 
   return command;
 }

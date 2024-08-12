@@ -23,8 +23,8 @@
         "command": "mythril-vsc.analyze",
         "title": "Mythril-VSC: Analyze File",
         "icon": {
-          "light": "./src/images/mythril-audit-light.svg",
-          "dark": "./src/images/mythril-audit-dark.svg"
+          "light": "./src/images/icons/mythril-audit-light.svg",
+          "dark": "./src/images/icons/mythril-audit-dark.svg"
         }
       }
     ],

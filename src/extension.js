@@ -22,14 +22,11 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// TODO container rimovibile
-// BUG impossibile cambiare le impostazioni, fs di sola lettura!
 // [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
 // [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
 // [IMPLEMENT] keybinding per analyze
 
 // FIXME il menù a tendina del fs mostra il comando 'Analyze' anche per file non '*.sol'
-// FIXME icone
 // FIXME il file .md non esiste (cioè in caso di errore) non bisogna tentare di aprirlo
 
 // TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
