@@ -23,13 +23,15 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// FIXME il menù a tendina del fs mostra il comando 'Analyze' anche per file non '*.sol'
-
+// [DEBUG] testare su linux e su altro windows
 // TODO refactoring  codice
+
+
+// TODO aggiornare README e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth :)
 // TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
+// TODO spiegare che è obbligatorio definire la versione del compialtore solc
 // TODO spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
 // TODO specificare che deve essere mappato così:'@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/'
-// TODO aggiornare README e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth :)
 // TODO migliorare icona ...
 
 async function launchCommand(baseName, fileDir, command) {

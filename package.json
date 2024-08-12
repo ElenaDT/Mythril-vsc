@@ -39,6 +39,7 @@
       "explorer/context": [
         {
           "command": "mythril-vsc.analyze",
+          "when": "resourceExtname == '.sol'",
           "group": "commands",
           "title": "Mythril-VSC: Analyze File"
         }
