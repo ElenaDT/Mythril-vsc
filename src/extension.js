@@ -22,6 +22,8 @@ function analyzeCommand(fileUri) {
   };
 }
 
+// TODO stop container al cancel dell'utente
+// [IMPLEMENT] aggiornamento settings
 // [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
 // [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
 // [IMPLEMENT] keybinding per analyze
