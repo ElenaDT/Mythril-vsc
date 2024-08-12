@@ -12,8 +12,9 @@ function activate(context) {
 
 function analyzeCommand(fileUri) {
   const filePath = fileUri ? fileUri.fsPath : utils.getActiveEditorFilePath();
+  const compilerVersion = utils.getCompilerVersion(filePath);
   const {baseName, fileDir, projectDir, execTimeout, useOpenZeppelin} = utils.getFileContext(filePath);
-  const command = utils.getCommand(baseName, fileDir, projectDir, execTimeout, useOpenZeppelin);
+  const command = utils.getCommand(baseName, fileDir, projectDir, execTimeout, compilerVersion, useOpenZeppelin);
   
   if (utils.isSolidityFile(filePath)) {
     launchCommand(baseName, fileDir, command);
@@ -22,14 +23,12 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// [IMPLEMENT] aggiornamento settings
-// [IMPLEMENT] imposta execTimeout booleano, se true scegli il numero in ms
-// [IMPLEMENT] recuperare o far impostare con una modale la versione di solc del contratto da analizzare
-// [IMPLEMENT] keybinding per analyze
+// [IMPLEMENT] aggiornamento settings quando vengono cambiate
 
 // FIXME il menù a tendina del fs mostra il comando 'Analyze' anche per file non '*.sol'
 // FIXME il file .md non esiste (cioè in caso di errore) non bisogna tentare di aprirlo
 
+// TODO refactoring  codice
 // TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
 // TODO spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
 // TODO specificare che deve essere mappato così:'@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/'
@@ -53,13 +52,13 @@ async function launchCommand(baseName, fileDir, command) {
 
         token.onCancellationRequested(() => {
           isCancelled = true;
-          vscode.window.showInformationMessage('Myth: analysis cancelled.'); 
+          vscode.window.showInformationMessage('Myth-VSC: analysis cancelled.'); 
           try {
             utils.stopDockerContainer();
             child.kill();
-            reject(new Error('Myth: analysis cancelled.'));
+            reject(new Error('Myth-VSC: analysis cancelled.'));
           } catch (error) {
-            vscode.window.showErrorMessage(`Error stopping Docker container: ${error.message}`);
+            vscode.window.showErrorMessage(`Myth-VSC: Error stopping Docker container: ${error.message}`);
           }
         });
 
@@ -72,7 +71,7 @@ async function launchCommand(baseName, fileDir, command) {
         });
 
         child.stderr.on('data', (data) => {
-          vscode.window.showErrorMessage(`Myth: ERROR: ${data.toString()}`);
+          vscode.window.showErrorMessage(`Myth-VSC: ERROR: ${data.toString()}`);
         });
 
         child.on('close', () => {
