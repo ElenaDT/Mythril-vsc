@@ -13,8 +13,8 @@ function activate(context) {
 function analyzeCommand(fileUri) {
   const filePath = fileUri ? fileUri.fsPath : utils.getActiveEditorFilePath();
   const compilerVersion = utils.getCompilerVersion(filePath);
-  const {baseName, fileDir, projectDir, execTimeout, useOpenZeppelin} = utils.getFileContext(filePath);
-  const command = utils.getCommand(baseName, fileDir, projectDir, execTimeout, compilerVersion, useOpenZeppelin);
+  const {baseName, fileDir, projectDir, execTimeoutON, execTimeout, useOpenZeppelin} = utils.getFileContext(filePath);
+  const command = utils.getCommand(baseName, fileDir, projectDir, execTimeoutON, execTimeout, compilerVersion, useOpenZeppelin);
   
   if (utils.isSolidityFile(filePath)) {
     launchCommand(baseName, fileDir, command);

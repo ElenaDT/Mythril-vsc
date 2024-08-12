@@ -9,10 +9,11 @@ function getFileContext(filePath) {
   const baseName = path.basename(filePath);
   const fileDir = path.dirname(filePath);
   const projectDir = path.dirname(fileDir);
-  const execTimeout = mythVscConfig.get('executionTimeout', 60);
+  const execTimeoutON = mythVscConfig.get('executionTimeoutEnabled', false);
+  const execTimeout = mythVscConfig.get('executionTimeout', 90);
   const useOpenZeppelin = mythVscConfig.get('useOpenZeppelin', 'false');
 
-  return { baseName, fileDir, projectDir, execTimeout, useOpenZeppelin };
+  return { baseName, fileDir, projectDir, execTimeoutON, execTimeout, useOpenZeppelin };
 };
 
 function getActiveEditorFilePath() {
@@ -24,15 +25,16 @@ function isSolidityFile(filePath) {
   return path.extname(filePath).toLowerCase() === '.sol';
 }
 
-function getCommand(baseName, fileDir, projectDir, execTimeout, solcVer, useOpenZeppelin){
+function getCommand(baseName, fileDir, projectDir, execTimeoutON, execTimeout, solcVer, useOpenZeppelin){
   let vol = `-v ${projectDir}/contracts:/tmp/contracts`;
   
   if (useOpenZeppelin) {
     const oZlib = ` -v ${projectDir}/node_modules/@openzeppelin/contracts:/tmp/node_modules/@openzeppelin/contracts`;
     vol += oZlib;
   }
-  
-  const mythArgs = `--solc-json=/tmp/contracts/solc-args.json --solv ${solcVer} -o markdown --execution-timeout ${execTimeout}`;
+
+  const timeoutArg = execTimeoutON ?  ` --execution-timeout ${execTimeout}` : '';
+  const mythArgs = `--solc-json=/tmp/contracts/solc-args.json --solv ${solcVer} -o markdown${timeoutArg}`;
   const command = `docker run --name "Mythril_Analysis" --rm ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${mythArgs}`;
 
   return command;
@@ -56,7 +58,7 @@ function getCompilerVersion(filePath) {
 
   if (pragmaLine) {
     const versionRange = pragmaLine.split(' ')[2];
-    const cleanVersion = versionRange.replace(/;/g, '');
+    const cleanVersion = versionRange.replace(/;/g, '').replace(/\r/g, '').trim();
     return cleanVersion;
   } else {
     vscode.window.showErrorMessage('Myth-VSC: Solc version not found');
