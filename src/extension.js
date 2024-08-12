@@ -23,10 +23,7 @@ function analyzeCommand(fileUri) {
   };
 }
 
-// [IMPLEMENT] aggiornamento settings quando vengono cambiate
-
 // FIXME il menù a tendina del fs mostra il comando 'Analyze' anche per file non '*.sol'
-// FIXME il file .md non esiste (cioè in caso di errore) non bisogna tentare di aprirlo
 
 // TODO refactoring  codice
 // TODO spiegare nel readme che i contratti devono essere in 'project_root/contracts'
@@ -49,6 +46,7 @@ async function launchCommand(baseName, fileDir, command) {
       return new Promise((resolve, reject) => {
         const child = spawn(command, { shell: true });
         let isCancelled = false;
+        let hasError = false;
 
         token.onCancellationRequested(() => {
           isCancelled = true;
@@ -72,13 +70,14 @@ async function launchCommand(baseName, fileDir, command) {
 
         child.stderr.on('data', (data) => {
           vscode.window.showErrorMessage(`Myth-VSC: ERROR: ${data.toString()}`);
+          hasError = true;
         });
 
         child.on('close', () => {
-          if (!isCancelled) {
+          if (!isCancelled && !hasError) {
             vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
-            resolve();
           }
+          resolve();
         });
 
         child.on('error', (err) => {
