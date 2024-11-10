@@ -26,6 +26,24 @@ function getCompilerVersion(filePath) {
   }
 }
 
+async function ensureDockerImage(imageName) {
+  const images = await docker.listImages();
+  const imageExists = images.some(image => image.RepoTags && image.RepoTags.includes(imageName));
+  console.log('*** imageExists ',imageExists);
+  if (!imageExists) {
+    vscode.window.showInformationMessage(`Pulling Docker image: ${imageName}`);
+    await new Promise((resolve, reject) => {
+      docker.pull(imageName, {}, (err, stream) => {
+        if (err) {
+          vscode.window.showErrorMessage(`Failed to pull Docker image: ${err.message}`);
+          return reject(err);
+        }
+        docker.modem.followProgress(stream, (err, res) => err ? reject(err) : resolve(res));
+      });
+    });
+  }
+}
+
 async function launchCommand(baseName, fileDir) {
   const fullPath = path.join(fileDir, `${baseName}-output.md`);
   const sourceFilePath = path.join(fileDir, baseName);
@@ -42,8 +60,11 @@ async function launchCommand(baseName, fileDir) {
   const dockerSourceFilePath = normalizePath(sourceFilePath);
   console.log('Mounting file:', { originalSourceFile: sourceFilePath, dockerSourceFile: dockerSourceFilePath });
 
+  const imageName = 'mythril/myth:latest';
+  await ensureDockerImage(imageName);
+
   const containerOptions = {
-    Image: 'mythril/myth',
+    Image: imageName,
     Cmd: ['sh', '-c', `myth analyze /tmp/${baseName} --solv ${solcVersion} -o markdown --execution-timeout 60`],
     Tty: false,
     HostConfig: { AutoRemove: true, Binds: [`${dockerSourceFilePath}:/tmp/${baseName}`] },
@@ -160,3 +181,4 @@ module.exports = {
     context.subscriptions.push(disposable);
   }
 };
+
