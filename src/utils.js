@@ -11,10 +11,9 @@ function getFileContext(filePath) {
   const projectDir = path.dirname(fileDir);
   const execTimeoutON = mythVscConfig.get('executionTimeoutEnabled', false);
   const execTimeout = mythVscConfig.get('executionTimeout', 90);
-  const useOpenZeppelin = mythVscConfig.get('useOpenZeppelin', 'false');
 
-  return { baseName, fileDir, projectDir, execTimeoutON, execTimeout, useOpenZeppelin };
-};
+  return { baseName, fileDir, projectDir, execTimeoutON, execTimeout };
+}
 
 function getActiveEditorFilePath() {
   const editor = vscode.window.activeTextEditor;
@@ -25,31 +24,12 @@ function isSolidityFile(filePath) {
   return path.extname(filePath).toLowerCase() === '.sol';
 }
 
-function getCommand(baseName, fileDir, projectDir, execTimeoutON, execTimeout, solcVer, useOpenZeppelin){
-  let vol = `-v ${projectDir}/contracts:/tmp/contracts`;
-  
-  if (useOpenZeppelin) {
-    const oZlib = ` -v ${projectDir}/node_modules/@openzeppelin/contracts:/tmp/node_modules/@openzeppelin/contracts`;
-    vol += oZlib;
-  }
+function getCommand(baseName, fileDir, projectDir, execTimeoutON, execTimeout, solcVer) {
+  const timeoutArg = execTimeoutON ? ` --execution-timeout ${execTimeout}` : '';
+  const mythArgs = `--solv ${solcVer} -o markdown${timeoutArg}`;
+  const command = `analyze /tmp/contracts/${baseName} ${mythArgs}`;
 
-  const timeoutArg = execTimeoutON ?  ` --execution-timeout ${execTimeout}` : '';
-  const mythArgs = `--solc-json=/tmp/contracts/solc-args.json --solv ${solcVer} -o markdown${timeoutArg}`;
-  const command = `docker run --name "Mythril_Analysis" --rm ${vol} mythril/myth analyze /tmp/contracts/${baseName} ${mythArgs}`;
-
-  return command;
-}
-
-function stopDockerContainer() {
-  return new Promise((resolve, reject) => {
-    const { exec } = require('child_process');
-    exec('docker stop Mythril_Analysis', (error, stdout, stderr) => {
-      if (error) {
-        return reject(error);
-      }
-      resolve(stdout);
-    });
-  });
+  return `${command}`;
 }
 
 function getCompilerVersion(filePath) {
@@ -66,13 +46,10 @@ function getCompilerVersion(filePath) {
   }
 }
 
-
 module.exports = {
   getFileContext,
   isSolidityFile,
   getActiveEditorFilePath,
   getCommand,
-  stopDockerContainer,
   getCompilerVersion
 };
-

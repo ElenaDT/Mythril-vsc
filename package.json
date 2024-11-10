@@ -31,8 +31,8 @@
     "keybindings": [
       {
         "command": "mythril-vsc.analyze",
-        "key": "ctrl+m",  
-        "when": "editorTextFocus" 
+        "key": "ctrl+m",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -57,19 +57,19 @@
       "title": "Mythril-VSC Extension Settings",
       "properties": {
         "mythril-vsc.executionTimeoutEnabled": {
-            "type": "boolean",
-            "default": false,
-            "description": "Enable or disable the execution timeout for Mythril analysis."
+          "type": "boolean",
+          "default": false,
+          "description": "Enable or disable the execution timeout for Mythril analysis."
         },
         "mythril-vsc.executionTimeout": {
-            "type": "number",
-            "default": 90,
-            "description": "The execution timeout in seconds for Mythril analysis. Only applicable if Execution Timeout Enabled is true."
+          "type": "number",
+          "default": 90,
+          "description": "The execution timeout in seconds for Mythril analysis. Only applicable if Execution Timeout Enabled is true."
         },
         "mythril-vsc.useOpenZeppelin": {
-        "type": "boolean",
-        "default": true,
-        "markdownDescription": "Choose whether to import OpenZeppelin contracts for Mythril analysis. This may slightly impact performance analysis."
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Choose whether to import OpenZeppelin contracts for Mythril analysis. This may slightly impact performance analysis."
         }
       }
     }
@@ -86,9 +86,9 @@
     "@types/vscode": "^1.89.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.3.9",
+    "dockerode": "^4.0.2",
     "eslint": "^9.9.0",
     "globals": "^15.8.0",
     "typescript": "^5.4.5"
   }
 }
-
