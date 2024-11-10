@@ -6,143 +6,145 @@ const vscode = require('vscode');
 
 const docker = new Docker();
 
-function normalizePath(windowsPath) {
-  let posixPath = windowsPath.replace(/\\/g, '/');
-  if (/^[A-Za-z]:/.test(posixPath)) {
-    posixPath = posixPath.replace(/^([A-Za-z]):/, '/host_mnt/$1').toLowerCase();
+function normalizePath(filePath) {
+  if (process.platform === 'win32') {
+    return filePath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '/host_mnt/$1').toLowerCase();
   }
-  return posixPath;
+  return filePath;
+}
+
+function getCompilerVersion(filePath) {
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const pragmaLine = fileContent.split('\n').find(line => line.startsWith('pragma solidity'));
+  if (pragmaLine) {
+    const versionRange = pragmaLine.split(' ')[2];
+    const cleanVersion = versionRange.replace(/[^0-9.]/g, '').trim();
+    return cleanVersion;
+  } else {
+    vscode.window.showErrorMessage('Myth-VSC: Solc version not found');
+    return null;
+  }
 }
 
 async function launchCommand(baseName, fileDir) {
   const fullPath = path.join(fileDir, `${baseName}-output.md`);
-  const progressLocation = vscode.ProgressLocation.Notification;
-
   const sourceFilePath = path.join(fileDir, baseName);
+
   if (!fs.existsSync(sourceFilePath)) {
     throw new Error(`Source file not found: ${sourceFilePath}`);
   }
 
-  const dockerSourceFilePath = normalizePath(sourceFilePath);
+  const solcVersion = getCompilerVersion(sourceFilePath);
+  if (!solcVersion) {
+    throw new Error('Solidity compiler version not found in the file');
+  }
 
-  console.log('Mounting file:', {
-    originalSourceFile: sourceFilePath,
-    dockerSourceFile: dockerSourceFilePath
-  });
+  const dockerSourceFilePath = normalizePath(sourceFilePath);
+  console.log('Mounting file:', { originalSourceFile: sourceFilePath, dockerSourceFile: dockerSourceFilePath });
 
   const containerOptions = {
     Image: 'mythril/myth',
-    Cmd: [
-      'sh',
-      '-c',
-      `myth analyze /tmp/${baseName} --solv 0.5.0 -o markdown --execution-timeout 60`
-    ],
+    Cmd: ['sh', '-c', `myth analyze /tmp/${baseName} --solv ${solcVersion} -o markdown --execution-timeout 60`],
     Tty: false,
-    HostConfig: {
-      AutoRemove: true,
-      Binds: [`${dockerSourceFilePath}:/tmp/${baseName}`]
-    },
+    HostConfig: { AutoRemove: true, Binds: [`${dockerSourceFilePath}:/tmp/${baseName}`] },
     WorkingDir: '/tmp'
   };
 
   await vscode.window.withProgress(
     {
-      location: progressLocation,
+      location: vscode.ProgressLocation.Notification,
       title: 'Analyzing contract...',
       cancellable: true,
     },
-    async (progress, token) => {
-      return new Promise((resolve, reject) => {
-        docker.createContainer(containerOptions)
-          .then(container => {
-            let output = '';
+    (progress, token) => new Promise((resolve, reject) => {
+      docker.createContainer(containerOptions)
+        .then(container => {
+          let output = '';
+          let hasError = false;
 
-            container.attach({stream: true, stdout: true, stderr: true}, (err, stream) => {
-              if (err) {
-                console.error('Attach error:', err);
-                reject(err);
-                return;
+          container.attach({ stream: true, stdout: true, stderr: true }, (err, stream) => {
+            if (err) {return rejectWithError('Attach error:', err, reject);}
+
+            stream.on('data', data => {
+              const chunk = data.toString();
+              console.log('Container output:', chunk);
+              output += chunk;
+
+              if (chunk.includes('Solc experienced a fatal error') || 
+                  chunk.includes('SyntaxError') || 
+                  chunk.includes('mythril.interfaces.cli [ERROR]: Traceback') ||
+                  chunk.includes('ValueError: Invalid version string')) {
+                hasError = true;
               }
+            });
 
-              stream.on('data', (data) => {
-                const chunk = data.toString();
-                console.log('Container output:', chunk);
-                output += chunk;
-              });
-
-              stream.on('end', () => {
+            stream.on('end', () => {
+              if (!hasError) {
                 try {
-                  // Clean the output to remove any non-printable characters
-                  const cleanOutput = output.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-
-                  // Ensure proper markdown formatting
-                  const formattedOutput = cleanOutput
-                    .replace(/## /g, '\n## ') // Ensure new lines before subheadings
-                    .replace(/### /g, '\n### ') // Ensure new lines before sub-subheadings
-                    .replace(/```/g, '\n```\n') // Ensure new lines around code blocks
-                    .replace(/- /g, '\n- '); // Ensure new lines before list items
-
-                  fs.writeFileSync(fullPath, formattedOutput);
-                  vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
+                  const formattedOutput = formatOutput(output);
+                  if (formattedOutput.trim()) {
+                    fs.writeFileSync(fullPath, formattedOutput);
+                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
+                  }
                   resolve();
                 } catch (err) {
-                  console.error('Error writing file:', err);
-                  vscode.window.showErrorMessage(`Error writing output file: ${err.message}`);
-                  reject(err);
+                  rejectWithError('Error writing file:', err, reject);
                 }
-              });
-
-              stream.on('error', (err) => {
-                console.error('Stream error:', err);
-                reject(err);
-              });
+              } else {
+                resolve();
+              }
             });
 
-            container.start()
-              .catch(err => {
-                console.error('Container start error:', err);
-                reject(err);
-              });
-
-            token.onCancellationRequested(() => {
-              container.stop()
-                .then(() => {
-                  vscode.window.showInformationMessage('Myth-VSC: analysis cancelled.');
-                  reject(new Error('Myth-VSC: analysis cancelled.'));
-                })
-                .catch(err => {
-                  console.error('Stop error:', err);
-                  vscode.window.showErrorMessage(`Myth-VSC: Error stopping Docker container: ${err.message}`);
-                  reject(err);
-                });
+            stream.on('error', err => {
+              hasError = true;
+              rejectWithError('Stream error:', err, reject);
             });
-          })
-          .catch(err => {
-            console.error('Container creation error:', err);
-            vscode.window.showErrorMessage(`Myth-VSC: ERROR: ${err.message}`);
-            reject(err);
           });
-      });
-    }
+
+          container.start().catch(err => rejectWithError('Container start error:', err, reject));
+
+          token.onCancellationRequested(() => {
+            container.stop()
+              .then(() => {
+                vscode.window.showInformationMessage('Myth-VSC: analysis cancelled.');
+                reject(new Error('Myth-VSC: analysis cancelled.'));
+              })
+              .catch(err => rejectWithError('Stop error:', err, reject));
+          });
+        })
+        .catch(err => rejectWithError('Container creation error:', err, reject));
+    })
   );
+}
+
+function formatOutput(output) {
+  return output
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    .replace(/## /g, '\n## ')
+    .replace(/### /g, '\n### ')
+    .replace(/```/g, '\n```\n')
+    .replace(/- /g, '\n- ');
+}
+
+function rejectWithError(message, err, reject) {
+  console.error(message, err);
+  vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
+  reject(err);
 }
 
 function analyzeCommand(fileUri) {
   try {
     const filePath = fileUri ? fileUri.fsPath : vscode.window.activeTextEditor.document.fileName;
-    if (!filePath) {
-      throw new Error('No file selected');
-    }
+    if (!filePath) {throw new Error('No file selected');}
 
     const baseName = path.basename(filePath);
     const fileDir = path.dirname(filePath);
 
     if (filePath.endsWith('.sol')) {
-      launchCommand(baseName, fileDir)
-        .catch(err => {
-          console.error('Launch command error:', err);
-          vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
-        });
+      launchCommand(baseName, fileDir).catch(err => {
+        console.error('Launch command error:', err);
+        vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
+      });
     } else {
       throw new Error('This command is only available for Solidity files (.sol).');
     }
