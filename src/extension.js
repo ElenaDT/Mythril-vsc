@@ -24,13 +24,12 @@ function analyzeCommand(fileUri) {
 }
 
 // TEST su altri contratti con import OZ
-// TEST testare su linux e su altro windows
 
 // TODO refactoring  codice
-// TEST di nuovo su linux e su altro windows
+// TEST su linux e su altro windows
 
 // TODO migliorare icona ...
-// TODO README -> aggiornarlo e specificare che serve solo Docker come dipendenza con l'immagine mythril/myth :)
+// TODO README -> aggiornarlo e specificare che serve solo Docker
 // TODO README -> spiegare che i contratti devono essere in 'project_root/contracts'
 // TODO README -> spiegare che è obbligatorio definire la versione del compialtore solc
 // TODO README -> spiegare che occorre creare file denominato'solc-args.json' per fare il remapping di OpenZeppelin
