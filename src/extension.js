@@ -26,8 +26,7 @@ function getCompilerVersion(filePath) {
     const cleanVersion = versionRange.replace(/[^0-9.]/g, '').trim();
     return cleanVersion;
   } else {
-    vscode.window.showErrorMessage('Myth-VSC: Solc version not found');
-    return null;
+    return undefined;
   }
 }
 
@@ -75,9 +74,7 @@ async function launchCommand(baseName, fileDir) {
   }
 
   const solcVersion = getCompilerVersion(sourceFilePath);
-  if (!solcVersion) {
-    throw new Error('Solidity compiler version not found in the file');
-  }
+  const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
 
   const dockerSourceFilePath = normalizePath(sourceFilePath);
   console.log('Mounting file:', {
@@ -93,7 +90,7 @@ async function launchCommand(baseName, fileDir) {
     Cmd: [
       'sh',
       '-c',
-      `myth analyze /tmp/${baseName} --solv ${solcVersion} -o markdown --execution-timeout 60`,
+      `myth analyze /tmp/${baseName} ${solcFlag} -o markdown --execution-timeout 60`,
     ],
     Tty: false,
     HostConfig: {
@@ -192,7 +189,6 @@ async function launchCommand(baseName, fileDir) {
       })
   );
 }
-
 function formatOutput(output) {
   return output
     .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
