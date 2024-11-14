@@ -49,3 +49,4 @@ out/
 Thumbs.db
 eslint.config.mjs
 .solcx-lock-*
+.prettierrc
