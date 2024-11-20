@@ -16,6 +16,8 @@ contract Nothing is ERC20 {
     bytes3 x_8 = "U";
     bytes3 x_9 = "U";
 
+    constructor() ERC20("Nothing", "NTH") {}
+
     function stringCompare(string memory a, string memory b) internal pure returns (bool) {
         if (bytes(a).length != bytes(b).length) {
             return false;

@@ -26,13 +26,12 @@ function getCompilerVersion(filePath) {
     const cleanVersion = versionRange.replace(/[^0-9.]/g, '').trim();
     return cleanVersion;
   } else {
-    return undefined;
+    return false;
   }
 }
 
 async function ensureDockerImage(imageName) {
   try {
-    // Controlla se Docker è in esecuzione
     await docker.ping();
   } catch (err) {
     vscode.window.showErrorMessage(
@@ -65,6 +64,25 @@ async function ensureDockerImage(imageName) {
   }
 }
 
+function hasOzImport(filePath) {
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  return fileContent.includes('@openzeppelin/contracts');
+}
+
+function createMappingsFile(fileDir) {
+  const mappingsPath = path.join(fileDir, 'mappings.json');
+  const mappingsContent = JSON.stringify(
+    {
+      optimizer: { enabled: true, runs: 200 },
+      viaIR: true,
+      remappings: ['@openzeppelin/=/tmp/node_modules/@openzeppelin/'],
+    },
+    null,
+    2
+  );
+  fs.writeFileSync(mappingsPath, mappingsContent);
+}
+
 async function launchCommand(baseName, fileDir) {
   const fullPath = path.join(fileDir, `${baseName}-output.md`);
   const sourceFilePath = path.join(fileDir, baseName);
@@ -85,17 +103,31 @@ async function launchCommand(baseName, fileDir) {
   const imageName = 'mythril/myth:latest';
   await ensureDockerImage(imageName);
 
+  if (hasOzImport(sourceFilePath)) {
+    createMappingsFile(fileDir);
+  }
+
+  const mappingsFilePath = path.join(fileDir, 'mappings.json');
+  const mappingsPath = normalizePath(mappingsFilePath);
+
+  const nodeModulesPath = path.join(fileDir, 'node_modules');
+  const normalizedNodeModulesPath = normalizePath(nodeModulesPath);
+
   const containerOptions = {
     Image: imageName,
     Cmd: [
       'sh',
       '-c',
-      `myth analyze /tmp/${baseName} ${solcFlag} -o markdown --execution-timeout 60`,
+      `myth analyze /tmp/${baseName} --solv 0.8.20 --solc-json /tmp/mappings.json -o markdown --execution-timeout 60`,
     ],
     Tty: false,
     HostConfig: {
       AutoRemove: true,
-      Binds: [`${dockerSourceFilePath}:/tmp/${baseName}`],
+      Binds: [
+        `${fileDir}:/tmp/`,
+        `${mappingsPath}:/tmp/mappings.json`,
+        `${normalizedNodeModulesPath}:/tmp/node_modules`,
+      ],
     },
     WorkingDir: '/tmp',
   };
@@ -189,6 +221,7 @@ async function launchCommand(baseName, fileDir) {
       })
   );
 }
+
 function formatOutput(output) {
   return output
     .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
