@@ -56,20 +56,10 @@
     "configuration": {
       "title": "Mythril-VSC Extension Settings",
       "properties": {
-        "mythril-vsc.executionTimeoutEnabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable or disable the execution timeout for Mythril analysis."
-        },
         "mythril-vsc.executionTimeout": {
           "type": "number",
           "default": 90,
           "description": "The execution timeout in seconds for Mythril analysis. Only applicable if Execution Timeout Enabled is true."
-        },
-        "mythril-vsc.useOpenZeppelin": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Choose whether to import OpenZeppelin contracts for Mythril analysis. This may slightly impact performance analysis."
         }
       }
     }

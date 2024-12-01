@@ -117,7 +117,6 @@ async function launchCommand(baseName, fileDir) {
   const nodeModulesPath = path.join(workspaceRoot, 'node_modules');
   const normalizedNodeModulesPath = normalizePath(nodeModulesPath);
 
-  // Verifica se node_modules esiste
   const binds = [`${fileDir}:/tmp/`, `${mappingsPath}:/tmp/mappings.json`];
 
   if (fs.existsSync(nodeModulesPath)) {
@@ -128,12 +127,16 @@ async function launchCommand(baseName, fileDir) {
     );
   }
 
+  // Recupera il timeout dalle configurazioni
+  const config = vscode.workspace.getConfiguration('mythril-vsc');
+  const executionTimeout = config.get('executionTimeout', 60);
+
   const containerOptions = {
     Image: imageName,
     Cmd: [
       'sh',
       '-c',
-      `myth analyze /tmp/${baseName} ${solcFlag} --solc-json /tmp/mappings.json -o markdown --execution-timeout 60`,
+      `myth analyze /tmp/${baseName} ${solcFlag} --solc-json /tmp/mappings.json -o markdown --execution-timeout ${executionTimeout}`,
     ],
     Tty: false,
     HostConfig: {
