@@ -5,6 +5,7 @@ const fs = require('fs');
 const Docker = require('dockerode');
 const vscode = require('vscode');
 const docker = new Docker();
+const config = vscode.workspace.getConfiguration('mythril-vsc');
 
 function normalizePath(filePath) {
   if (process.platform === 'win32') {
@@ -101,8 +102,9 @@ async function launchCommand(baseName, fileDir) {
 
   const imageName = 'mythril/myth:latest';
   await ensureDockerImage(imageName);
+  const generateMappingsFile = config.get('generateconfigFile', true);
 
-  if (hasOzImport(sourceFilePath)) {
+  if (generateMappingsFile) {
     createMappingsFile(fileDir);
   }
 
@@ -127,8 +129,6 @@ async function launchCommand(baseName, fileDir) {
     );
   }
 
-  // Recupera il timeout dalle configurazioni
-  const config = vscode.workspace.getConfiguration('mythril-vsc');
   const executionTimeout = config.get('executionTimeout', 60);
 
   const containerOptions = {

@@ -60,6 +60,11 @@
           "type": "number",
           "default": 90,
           "description": "The execution timeout in seconds for Mythril analysis. Only applicable if Execution Timeout Enabled is true."
+        },
+        "mythril-vsc.generateMappingsFile": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate a mappings file for Mythril analysis."
         }
       }
     }
