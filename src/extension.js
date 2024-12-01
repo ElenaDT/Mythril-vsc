@@ -237,7 +237,7 @@ async function launchCommand(baseName, fileDir) {
 }
 function formatOutput(output) {
   return output
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    .replace(/^[^#]*/, '')
     .replace(/## /g, '\n## ')
     .replace(/### /g, '\n### ')
     .replace(/```/g, '\n```\n')
