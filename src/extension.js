@@ -117,21 +117,28 @@ async function launchCommand(baseName, fileDir) {
   const nodeModulesPath = path.join(workspaceRoot, 'node_modules');
   const normalizedNodeModulesPath = normalizePath(nodeModulesPath);
 
+  // Verifica se node_modules esiste
+  const binds = [`${fileDir}:/tmp/`, `${mappingsPath}:/tmp/mappings.json`];
+
+  if (fs.existsSync(nodeModulesPath)) {
+    binds.push(`${normalizedNodeModulesPath}:/tmp/node_modules`);
+  } else {
+    console.warn(
+      `Warning: node_modules directory does not exist at ${nodeModulesPath}`
+    );
+  }
+
   const containerOptions = {
     Image: imageName,
     Cmd: [
       'sh',
       '-c',
-      `myth analyze /tmp/${baseName} --solv 0.8.20 --solc-json /tmp/mappings.json -o markdown --execution-timeout 60`,
+      `myth analyze /tmp/${baseName} ${solcFlag} --solc-json /tmp/mappings.json -o markdown --execution-timeout 60`,
     ],
     Tty: false,
     HostConfig: {
       AutoRemove: true,
-      Binds: [
-        `${fileDir}:/tmp/`,
-        `${mappingsPath}:/tmp/mappings.json`,
-        `${normalizedNodeModulesPath}:/tmp/node_modules`,
-      ],
+      Binds: binds,
     },
     WorkingDir: '/tmp',
   };
@@ -225,7 +232,6 @@ async function launchCommand(baseName, fileDir) {
       })
   );
 }
-
 function formatOutput(output) {
   return output
     .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
