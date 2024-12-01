@@ -45,7 +45,6 @@ async function ensureDockerImage(imageName) {
   const imageExists = images.some(
     (image) => image.RepoTags && image.RepoTags.includes(imageName)
   );
-  console.log('*** imageExists ', imageExists);
   if (!imageExists) {
     vscode.window.showInformationMessage(`Pulling Docker image: ${imageName}`);
     await new Promise((resolve, reject) => {
@@ -66,7 +65,7 @@ async function ensureDockerImage(imageName) {
 
 function hasOzImport(filePath) {
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  return fileContent.includes('@openzeppelin/contracts');
+  return fileContent.includes('@openzeppelin');
 }
 
 function createMappingsFile(fileDir) {
@@ -110,7 +109,12 @@ async function launchCommand(baseName, fileDir) {
   const mappingsFilePath = path.join(fileDir, 'mappings.json');
   const mappingsPath = normalizePath(mappingsFilePath);
 
-  const nodeModulesPath = path.join(fileDir, 'node_modules');
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders || workspaceFolders.length === 0) {
+    throw new Error('No workspace folder found');
+  }
+  const workspaceRoot = workspaceFolders[0].uri.fsPath;
+  const nodeModulesPath = path.join(workspaceRoot, 'node_modules');
   const normalizedNodeModulesPath = normalizePath(nodeModulesPath);
 
   const containerOptions = {
