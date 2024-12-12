@@ -1,288 +1,378 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const Docker = require('dockerode');
 const vscode = require('vscode');
+const Docker = require('dockerode');
 const docker = new Docker();
-const config = vscode.workspace.getConfiguration('mythril-vsc');
 
-function normalizePath(filePath) {
-  if (process.platform === 'win32') {
-    return filePath
-      .replace(/\\/g, '/')
-      .replace(/^([A-Za-z]):/, '/host_mnt/$1')
-      .toLowerCase();
-  }
-  return filePath;
-}
-
-function getCompilerVersion(filePath) {
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  const pragmaLine = fileContent
-    .split('\n')
-    .find((line) => line.startsWith('pragma solidity'));
-  if (pragmaLine) {
-    const versionRange = pragmaLine.split(' ')[2];
-    const cleanVersion = versionRange.replace(/[^0-9.]/g, '').trim();
-    return cleanVersion;
-  } else {
-    return false;
-  }
-}
-
-async function ensureDockerImage(imageName) {
-  try {
-    await docker.ping();
-  } catch (err) {
-    vscode.window.showErrorMessage(
-      'Error: Docker Desktop is not running. Please start Docker Desktop.'
-    );
-    console.error('Error:', err);
-    return;
+class MythrilAnalyzer {
+  constructor(context) {
+    this.config = vscode.workspace.getConfiguration('mythril-vsc');
+    this.context = context;
+    this.activeAnalysis = false;
   }
 
-  const images = await docker.listImages();
-  const imageExists = images.some(
-    (image) => image.RepoTags && image.RepoTags.includes(imageName)
-  );
-  if (!imageExists) {
-    vscode.window.showInformationMessage(`Pulling Docker image: ${imageName}`);
-    await new Promise((resolve, reject) => {
-      docker.pull(imageName, {}, (err, stream) => {
-        if (err) {
-          vscode.window.showErrorMessage(
-            `Failed to pull Docker image: ${err.message}`
-          );
-          return reject(err);
-        }
-        docker.modem.followProgress(stream, (err, res) =>
-          err ? reject(err) : resolve(res)
-        );
-      });
-    });
-  }
-}
+  async getCompilerVersion(uri) {
+    try {
+      const fileContent = await vscode.workspace.fs.readFile(uri);
+      const fileContentStr = Buffer.from(fileContent).toString('utf8');
+      const pragmaLine = fileContentStr
+        .split('\n')
+        .find((line) => line.startsWith('pragma solidity'));
 
-function hasOzImport(filePath) {
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  return fileContent.includes('@openzeppelin');
-}
-
-function createMappingsFile(fileDir) {
-  const mappingsPath = path.join(fileDir, 'mappings.json');
-  const mappingsContent = JSON.stringify(
-    {
-      optimizer: { enabled: true, runs: 200 },
-      viaIR: true,
-      remappings: ['@openzeppelin/=/tmp/node_modules/@openzeppelin/'],
-    },
-    null,
-    2
-  );
-  fs.writeFileSync(mappingsPath, mappingsContent);
-}
-
-async function launchCommand(baseName, fileDir) {
-  const fullPath = path.join(fileDir, `${baseName}-output.md`);
-  const sourceFilePath = path.join(fileDir, baseName);
-
-  if (!fs.existsSync(sourceFilePath)) {
-    throw new Error(`Source file not found: ${sourceFilePath}`);
+      if (pragmaLine) {
+        const versionRange = pragmaLine.split(' ')[2];
+        return versionRange.replace(/[^0-9.]/g, '').trim();
+      }
+      return false;
+    } catch (err) {
+      throw vscode.FileSystemError.FileNotFound(uri);
+    }
   }
 
-  const solcVersion = getCompilerVersion(sourceFilePath);
-  const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
-
-  const dockerSourceFilePath = normalizePath(sourceFilePath);
-  console.log('Mounting file:', {
-    originalSourceFile: sourceFilePath,
-    dockerSourceFile: dockerSourceFilePath,
-  });
-
-  const imageName = 'mythril/myth:latest';
-  await ensureDockerImage(imageName);
-  const generateMappingsFile = config.get('generateconfigFile', true);
-
-  if (generateMappingsFile) {
-    createMappingsFile(fileDir);
-  }
-
-  const mappingsFilePath = path.join(fileDir, 'mappings.json');
-  const mappingsPath = normalizePath(mappingsFilePath);
-
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (!workspaceFolders || workspaceFolders.length === 0) {
-    throw new Error('No workspace folder found');
-  }
-  const workspaceRoot = workspaceFolders[0].uri.fsPath;
-  const nodeModulesPath = path.join(workspaceRoot, 'node_modules');
-  const normalizedNodeModulesPath = normalizePath(nodeModulesPath);
-
-  const binds = [`${fileDir}:/tmp/`, `${mappingsPath}:/tmp/mappings.json`];
-
-  if (fs.existsSync(nodeModulesPath)) {
-    binds.push(`${normalizedNodeModulesPath}:/tmp/node_modules`);
-  } else {
-    console.warn(
-      `Warning: node_modules directory does not exist at ${nodeModulesPath}`
-    );
-  }
-
-  const executionTimeout = config.get('executionTimeout', 60);
-
-  const containerOptions = {
-    Image: imageName,
-    Cmd: [
-      'sh',
-      '-c',
-      `myth analyze /tmp/${baseName} ${solcFlag} --solc-json /tmp/mappings.json -o markdown --execution-timeout ${executionTimeout}`,
-    ],
-    Tty: false,
-    HostConfig: {
-      AutoRemove: true,
-      Binds: binds,
-    },
-    WorkingDir: '/tmp',
-  };
-
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: 'Analyzing contract...',
-      cancellable: true,
-    },
-    (progress, token) =>
-      new Promise((resolve, reject) => {
-        docker
-          .createContainer(containerOptions)
-          .then((container) => {
-            let output = '';
-            let hasError = false;
-
-            container.attach(
-              { stream: true, stdout: true, stderr: true },
-              (err, stream) => {
-                if (err) {
-                  return rejectWithError('Attach error:', err, reject);
-                }
-
-                stream.on('data', (data) => {
-                  const chunk = data.toString();
-                  console.log('Container output:', chunk);
-                  output += chunk;
-
-                  if (
-                    chunk.includes('Solc experienced a fatal error') ||
-                    chunk.includes('SyntaxError') ||
-                    chunk.includes(
-                      'mythril.interfaces.cli [ERROR]: Traceback'
-                    ) ||
-                    chunk.includes('ValueError: Invalid version string')
-                  ) {
-                    hasError = true;
-                  }
-                });
-
-                stream.on('end', () => {
-                  if (!hasError) {
-                    try {
-                      const formattedOutput = formatOutput(output);
-                      if (formattedOutput.trim()) {
-                        fs.writeFileSync(fullPath, formattedOutput);
-                        vscode.commands.executeCommand(
-                          'vscode.open',
-                          vscode.Uri.file(fullPath)
-                        );
-                      }
-                      resolve();
-                    } catch (err) {
-                      rejectWithError('Error writing file:', err, reject);
-                    }
-                  } else {
-                    resolve();
-                  }
-                });
-
-                stream.on('error', (err) => {
-                  hasError = true;
-                  rejectWithError('Stream error:', err, reject);
-                });
-              }
-            );
-
-            container
-              .start()
-              .catch((err) =>
-                rejectWithError('Container start error:', err, reject)
-              );
-
-            token.onCancellationRequested(() => {
-              container
-                .stop()
-                .then(() => {
-                  vscode.window.showInformationMessage(
-                    'Myth-VSC: analysis cancelled.'
-                  );
-                  reject(new Error('Myth-VSC: analysis cancelled.'));
-                })
-                .catch((err) => rejectWithError('Stop error:', err, reject));
-            });
-          })
-          .catch((err) =>
-            rejectWithError('Container creation error:', err, reject)
-          );
-      })
-  );
-}
-function formatOutput(output) {
-  return output
-    .replace(/^[^#]*/, '')
-    .replace(/## /g, '\n## ')
-    .replace(/### /g, '\n### ')
-    .replace(/```/g, '\n```\n')
-    .replace(/- /g, '\n- ');
-}
-
-function rejectWithError(message, err, reject) {
-  console.error(message, err);
-  vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
-  reject(err);
-}
-
-function analyzeCommand(fileUri) {
-  try {
-    const filePath = fileUri
-      ? fileUri.fsPath
-      : vscode.window.activeTextEditor.document.fileName;
-    if (!filePath) {
-      throw new Error('No file selected');
+  async ensureDockerImage(imageName) {
+    try {
+      await docker.ping();
+    } catch (err) {
+      throw new Error('Docker non è in esecuzione. Per favore, avvia Docker.');
     }
 
-    const baseName = path.basename(filePath);
-    const fileDir = path.dirname(filePath);
+    const images = await docker.listImages();
+    const imageExists = images.some((image) =>
+      image.RepoTags?.includes(imageName)
+    );
 
-    if (filePath.endsWith('.sol')) {
-      launchCommand(baseName, fileDir).catch((err) => {
-        console.error('Launch command error:', err);
-        vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
-      });
-    } else {
-      throw new Error(
-        'This command is only available for Solidity files (.sol).'
+    if (!imageExists) {
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Scaricamento dell'immagine Docker: ${imageName}`,
+          cancellabile: false,
+        },
+        async (progress) => {
+          progress.report({ message: 'Download in corso...' });
+          await new Promise((resolve, reject) => {
+            docker.pull(imageName, {}, (err, stream) => {
+              if (err) {
+                return reject(
+                  new Error(
+                    `Impossibile scaricare l'immagine Docker: ${err.message}`
+                  )
+                );
+              }
+              docker.modem.followProgress(
+                stream,
+                (err, res) => (err ? reject(err) : resolve(res)),
+                (event) => {
+                  if (event.progress) {
+                    progress.report({
+                      message: `${event.status}: ${event.progress}`,
+                    });
+                  }
+                }
+              );
+            });
+          });
+        }
       );
     }
-  } catch (err) {
-    console.error('Analyze command error:', err);
-    vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
+  }
+
+  async checkDependencies(sourceUri) {
+    try {
+      const fileContent = await vscode.workspace.fs.readFile(sourceUri);
+      const contentStr = Buffer.from(fileContent).toString('utf8');
+
+      if (contentStr.includes('@openzeppelin')) {
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+        if (!workspaceFolder) {
+          throw new Error(
+            'Nessuna cartella di lavoro trovata per il controllo delle dipendenze'
+          );
+        }
+
+        const nodeModulesUri = vscode.Uri.joinPath(
+          workspaceFolder.uri,
+          'node_modules/@openzeppelin'
+        );
+        try {
+          await vscode.workspace.fs.stat(nodeModulesUri);
+        } catch {
+          throw new Error(
+            'Dipendenze OpenZeppelin non trovate. Esegui "npm install".'
+          );
+        }
+      }
+      return true;
+    } catch (err) {
+      throw new Error(`Controllo delle dipendenze fallito: ${err.message}`);
+    }
+  }
+
+  async createMappingsFile(workspaceUri) {
+    const mappingsContent = JSON.stringify(
+      {
+        optimizer: { enabled: true, runs: 200 },
+        viaIR: true,
+        remappings: [
+          '@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/',
+          '@openzeppelin/=/tmp/node_modules/@openzeppelin/',
+        ],
+      },
+      null,
+      2
+    );
+
+    const mappingsUri = vscode.Uri.joinPath(workspaceUri, 'mappings.json');
+    await vscode.workspace.fs.writeFile(
+      mappingsUri,
+      Buffer.from(mappingsContent, 'utf8')
+    );
+    return mappingsUri;
+  }
+
+  async analyze(sourceUri) {
+    if (this.activeAnalysis) {
+      vscode.window.showWarningMessage(
+        "Un'analisi è già in corso. Attendere il completamento o annullarla."
+      );
+      return;
+    }
+
+    this.activeAnalysis = true;
+
+    try {
+      await this.checkDependencies(sourceUri);
+
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+      if (!workspaceFolder) {
+        throw new Error('Nessuna cartella di lavoro trovata');
+      }
+
+      const fileName = sourceUri.path.split('/').pop();
+      const outputUri = vscode.Uri.joinPath(
+        workspaceFolder.uri,
+        `${fileName}-output.md`
+      );
+
+      const solcVersion = await this.getCompilerVersion(sourceUri);
+      const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
+
+      const imageName = 'mythril/myth:latest';
+      await this.ensureDockerImage(imageName);
+
+      const mappingsUri = await this.createMappingsFile(workspaceFolder.uri);
+      await this.runDockerAnalysis(sourceUri, outputUri, mappingsUri, solcFlag);
+    } catch (err) {
+      vscode.window.showErrorMessage(
+        `Configurazione dell'analisi fallita: ${err.message}`
+      );
+      console.error("Errore nella configurazione dell'analisi:", err);
+    } finally {
+      this.activeAnalysis = false;
+    }
+  }
+  async runDockerAnalysis(sourceUri, outputUri, mappingsUri, solcFlag) {
+    const executionTimeout = this.config.get('executionTimeout', 60);
+    const fileName = sourceUri.path.split('/').pop();
+
+    const containerOptions = {
+      Image: 'mythril/myth:latest',
+      Cmd: [
+        'sh',
+        '-c',
+        `myth analyze /tmp/${fileName} ${solcFlag} --solc-json /tmp/mappings.json -o markdown --execution-timeout ${executionTimeout}`,
+      ],
+      Tty: false,
+      HostConfig: {
+        AutoRemove: true, // Il container si rimuove automaticamente alla fine
+        Binds: [
+          `${sourceUri.fsPath}:/tmp/${fileName}`,
+          `${mappingsUri.fsPath}:/tmp/mappings.json`,
+        ],
+      },
+      WorkingDir: '/tmp',
+    };
+
+    // Aggiunta gestione dei bind per node_modules
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+    if (workspaceFolder) {
+      const nodeModulesUri = vscode.Uri.joinPath(
+        workspaceFolder.uri,
+        'node_modules'
+      );
+      try {
+        await vscode.workspace.fs.stat(nodeModulesUri);
+        containerOptions.HostConfig.Binds.push(
+          `${nodeModulesUri.fsPath}:/tmp/node_modules`
+        );
+      } catch {
+        const fileNodeModulesUri = vscode.Uri.joinPath(
+          sourceUri.with({ path: sourceUri.path.replace(fileName, '') }),
+          'node_modules'
+        );
+        try {
+          await vscode.workspace.fs.stat(fileNodeModulesUri);
+          containerOptions.HostConfig.Binds.push(
+            `${fileNodeModulesUri.fsPath}:/tmp/node_modules`
+          );
+        } catch {
+          vscode.window.showWarningMessage(
+            'node_modules non trovata. Gli import OpenZeppelin potrebbero non funzionare.'
+          );
+        }
+      }
+    }
+
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'Analisi del contratto in corso...',
+        cancellable: true,
+      },
+      async (progress, token) => {
+        let container;
+        let isCancelled = false;
+
+        try {
+          progress.report({ message: 'Creazione del container...' });
+          container = await docker.createContainer(containerOptions);
+
+          progress.report({ message: "Avvio dell'analisi..." });
+          const stream = await container.attach({
+            stream: true,
+            stdout: true,
+            stderr: true,
+          });
+
+          stream.setEncoding('utf8');
+
+          let output = '';
+          let hasError = false;
+          let errorMessage = '';
+
+          stream.on('data', (chunk) => {
+            output += chunk;
+            progress.report({ message: "Elaborazione dell'analisi..." });
+
+            if (this.isErrorOutput(chunk)) {
+              hasError = true;
+              errorMessage += chunk;
+            }
+          });
+
+          await container.start();
+
+          token.onCancellationRequested(async () => {
+            if (container && !isCancelled) {
+              isCancelled = true;
+              progress.report({ message: "Annullamento dell'analisi..." });
+              try {
+                await container.stop();
+                vscode.window.showInformationMessage(
+                  "Analisi annullata dall'utente."
+                );
+              } catch (err) {
+                // Ignora errori se il container è già terminato
+              }
+            }
+          });
+
+          // Attende che il container termini o che l'analisi venga annullata
+          await new Promise((resolve, reject) => {
+            container.wait((err, data) => {
+              if (err && !isCancelled) {
+                reject(err);
+              } else {
+                resolve(data);
+              }
+            });
+          });
+
+          if (isCancelled) {
+            return;
+          }
+
+          if (hasError) {
+            vscode.window.showErrorMessage(`Analisi fallita: ${errorMessage}`);
+            return;
+          }
+
+          if (!output.trim()) {
+            vscode.window.showInformationMessage(
+              'Nessun problema trovato nel contratto.'
+            );
+            return;
+          }
+
+          progress.report({ message: 'Salvataggio dei risultati...' });
+
+          const formattedOutput = this.formatOutput(output);
+          await vscode.workspace.fs.writeFile(
+            outputUri,
+            Buffer.from(formattedOutput, 'utf8')
+          );
+
+          const document = await vscode.workspace.openTextDocument(outputUri);
+          await vscode.window.showTextDocument(document, { preview: false });
+          vscode.window.showInformationMessage(
+            'Analisi completata con successo.'
+          );
+        } catch (err) {
+          if (err.message !== 'canceled' && !isCancelled) {
+            vscode.window.showErrorMessage(
+              `Errore durante l'analisi: ${err.message}`
+            );
+            console.error("Errore durante l'analisi:", err);
+          }
+        } finally {
+          this.activeAnalysis = false;
+          // Il container si rimuove automaticamente grazie ad AutoRemove: true
+        }
+      }
+    );
+  }
+  isErrorOutput(chunk) {
+    return (
+      chunk.includes('Solc experienced a fatal error') ||
+      chunk.includes('SyntaxError') ||
+      chunk.includes('mythril.interfaces.cli [ERROR]: Traceback') ||
+      chunk.includes('ValueError: Invalid version string') ||
+      chunk.includes('File not found')
+    );
+  }
+
+  formatOutput(output) {
+    return output
+      .replace(/^[^#]*/, '')
+      .replace(/## /g, '\n## ')
+      .replace(/### /g, '\n### ')
+      .replace(/```/g, '\n```\n')
+      .replace(/- /g, '\n- ');
   }
 }
 
 module.exports = {
-  activate: (context) => {
+  activate(context) {
+    const analyzer = new MythrilAnalyzer(context);
     const disposable = vscode.commands.registerCommand(
       'mythril-vsc.analyze',
-      analyzeCommand
+      async (fileUri) => {
+        try {
+          const uri = fileUri || vscode.window.activeTextEditor?.document.uri;
+          if (!uri) {
+            throw new Error('Nessun file selezionato');
+          }
+          if (!uri.path.endsWith('.sol')) {
+            throw new Error(
+              'Questo comando è disponibile solo per file Solidity (.sol)'
+            );
+          }
+          await analyzer.analyze(uri);
+        } catch (err) {
+          vscode.window.showErrorMessage(`Myth-VSC: ${err.message}`);
+          console.error("Errore durante l'analisi:", err);
+        }
+      }
     );
     context.subscriptions.push(disposable);
   },
