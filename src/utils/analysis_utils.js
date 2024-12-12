@@ -4,6 +4,7 @@ const vscode = require('vscode');
 const Docker = require('dockerode');
 const docker = new Docker();
 const { isErrorOutput, formatOutput } = require('./format_utils');
+const { PassThrough } = require('stream');
 
 async function runDockerAnalysis(
   sourceUri,
@@ -83,20 +84,25 @@ async function runDockerAnalysis(
           stderr: true,
         });
 
-        stream.setEncoding('utf8');
+        // Demultiplexing del flusso per separare stdout e stderr
+        const stdoutStream = new PassThrough();
+        const stderrStream = new PassThrough();
+
+        docker.modem.demuxStream(stream, stdoutStream, stderrStream);
+
+        stdoutStream.setEncoding('utf8');
+        stderrStream.setEncoding('utf8');
 
         let output = '';
-        let hasError = false;
-        let errorMessage = '';
+        let errorOutput = '';
 
-        stream.on('data', (chunk) => {
+        stdoutStream.on('data', (chunk) => {
           output += chunk;
           progress.report({ message: "Elaborazione dell'analisi..." });
+        });
 
-          if (isErrorOutput(chunk)) {
-            hasError = true;
-            errorMessage += chunk;
-          }
+        stderrStream.on('data', (chunk) => {
+          errorOutput += chunk;
         });
 
         await container.start();
@@ -112,7 +118,12 @@ async function runDockerAnalysis(
               vscode.window.showInformationMessage(
                 'Analisi annullata con successo.'
               );
-            } catch (err) {}
+            } catch (err) {
+              console.error(
+                "Errore durante l'annullamento del container:",
+                err
+              );
+            }
           }
         });
 
@@ -130,8 +141,8 @@ async function runDockerAnalysis(
           return;
         }
 
-        if (hasError) {
-          vscode.window.showErrorMessage(`Analisi fallita: ${errorMessage}`);
+        if (errorOutput.trim()) {
+          vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput}`);
           return;
         }
 
