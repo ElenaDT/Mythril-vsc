@@ -46,10 +46,10 @@ class MythrilAnalyzer {
         {
           location: vscode.ProgressLocation.Notification,
           title: `Scaricamento dell'immagine Docker: ${imageName}`,
-          cancellabile: false,
+          cancellable: false,
         },
         async (progress) => {
-          progress.report({ message: 'Download in corso...' });
+          progress.report({ message: 'Download in corso.' });
           await new Promise((resolve, reject) => {
             docker.pull(imageName, {}, (err, stream) => {
               if (err) {
@@ -171,6 +171,7 @@ class MythrilAnalyzer {
       this.activeAnalysis = false;
     }
   }
+
   async runDockerAnalysis(sourceUri, outputUri, mappingsUri, solcFlag) {
     const executionTimeout = this.config.get('executionTimeout', 60);
     const fileName = sourceUri.path.split('/').pop();
@@ -184,7 +185,7 @@ class MythrilAnalyzer {
       ],
       Tty: false,
       HostConfig: {
-        AutoRemove: true, // Il container si rimuove automaticamente alla fine
+        AutoRemove: true,
         Binds: [
           `${sourceUri.fsPath}:/tmp/${fileName}`,
           `${mappingsUri.fsPath}:/tmp/mappings.json`,
@@ -193,7 +194,6 @@ class MythrilAnalyzer {
       WorkingDir: '/tmp',
     };
 
-    // Aggiunta gestione dei bind per node_modules
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
     if (workspaceFolder) {
       const nodeModulesUri = vscode.Uri.joinPath(
@@ -226,7 +226,7 @@ class MythrilAnalyzer {
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: 'Analisi del contratto in corso...',
+        title: 'Analisi del contratto in corso',
         cancellable: true,
       },
       async (progress, token) => {
@@ -234,7 +234,7 @@ class MythrilAnalyzer {
         let isCancelled = false;
 
         try {
-          progress.report({ message: 'Creazione del container...' });
+          progress.report({ message: 'Creazione del container' });
           container = await docker.createContainer(containerOptions);
 
           progress.report({ message: "Avvio dell'analisi..." });
@@ -265,19 +265,18 @@ class MythrilAnalyzer {
           token.onCancellationRequested(async () => {
             if (container && !isCancelled) {
               isCancelled = true;
-              progress.report({ message: "Annullamento dell'analisi..." });
+              vscode.window.showInformationMessage(
+                "Annullamento dell'analisi in corso. Attendere la conferma."
+              );
               try {
                 await container.stop();
                 vscode.window.showInformationMessage(
-                  "Analisi annullata dall'utente."
+                  'Analisi annullata con successo.'
                 );
-              } catch (err) {
-                // Ignora errori se il container è già terminato
-              }
+              } catch (err) {}
             }
           });
 
-          // Attende che il container termini o che l'analisi venga annullata
           await new Promise((resolve, reject) => {
             container.wait((err, data) => {
               if (err && !isCancelled) {
@@ -304,7 +303,7 @@ class MythrilAnalyzer {
             return;
           }
 
-          progress.report({ message: 'Salvataggio dei risultati...' });
+          progress.report({ message: 'Salvataggio dei risultati.' });
 
           const formattedOutput = this.formatOutput(output);
           await vscode.workspace.fs.writeFile(
@@ -326,11 +325,11 @@ class MythrilAnalyzer {
           }
         } finally {
           this.activeAnalysis = false;
-          // Il container si rimuove automaticamente grazie ad AutoRemove: true
         }
       }
     );
   }
+
   isErrorOutput(chunk) {
     return (
       chunk.includes('Solc experienced a fatal error') ||
