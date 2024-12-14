@@ -1,69 +1,61 @@
-# mythril-vsc README
+# Mythril VSC - Analizzatore di Sicurezza per Smart Contract Solidity
 
-Un'estensione per integrare l'uso di Mythril in Visual Studio Code.
+## 🛡️ **Panoramica**
 
-## Dipendenze
+Mythril VSC è un'estensione di Visual Studio Code che integra il framework di analisi statica **Mythril**, progettato per rilevare vulnerabilità di sicurezza nei contratti Solidity.
+Con questa estensione, è possibile eseguire analisi di sicurezza direttamente all'interno dell'editor, fornendo un'interfaccia intuitiva e rapida per analizzare i contratti.
 
-È necessario installare [Mythril insieme al compilatore per i file Solidity](https://mythril-classic.readthedocs.io/en/master/installation.html).
+## ✨ **Caratteristiche Principali**
 
-## Sviluppo
+- **🐳 Funziona in Ambiente Isolato**: utilizzo di Mythril in un container Docker per garantire un ambiente sicuro e indipendente per l'analisi.
+- **🚀 Integrazione con OpenZeppelin**: supporto nativo per le librerie più utilizzate nella sicurezza degli smart contract.
+- **🔍 Auto-detection Solidity**: rilevamento automatico della versione di Solidity del contratto
+- **⚙️ Configurazione Personalizzabile**: è possibile configurare l'estensione direttamente tramite le impostazioni di Visual Studio Code.
+- **📊 Report In Markdown**: genera report in formato Markdown per una facile lettura e condivisione dei risultati.
 
-Il branch di sviluppo è `develop`.
+## 🔧 **Requisiti di Sistema**
 
-- [Installare Mythril e Solc](#dipendenze);
-- Clonare la presente repository;
+- **Visual Studio Code**
+- **Docker Desktop** (in esecuzione)
+- **Node.js** (versione 14 o superiore)
 
-> Dopo aver clonato questa repository, ricordare di lanciare `npm install` per avere tutte le **dipendenze** elencate nella sezione `devDependencies` del `package.json`.
+## 🛠️ Configurazione
 
-### Debug
+È possibile personalizzare le impostazioni dell'estensione modificando il file settings.json di VSCode:
 
-Si può testare l'applicazione clonando la presente repository e avviandone l'esecuzione con il debugger di VSC (premendo il tasto 'F5').
+```json
+{
+  "mythril-vsc.executionTimeout": 60 // Timeout in secondi per l'analisi
+}
+```
 
-## Installazione dal codice binario
+## 🐛 Problemi Comuni
 
-Se si vuole installare l'app per una demo, è possibile farlo con il file `.vsix` contenuto in questa repository.
+1. **Docker non risponde**:
 
-### Istruzioni per installare VSIX da Visual Studio Code
+   - Verificare che Docker Desktop sia in esecuzione
+   - Controllare i permessi di Docker e che non ci siano conflitti di rete
 
-- [Installare Mythril e Solc](#dipendenze);
-- In VSC: Visualizza > Estensioni;
-- click sui tre puntini in alto nel tab delle estensioni > "Installa da VSIX";
-- Riavviare VSC, se necessario.
+2. **Errori con OpenZeppelin**:
 
-## Funzionalità
+   - Assicurarsi che il pacchetto `@openzeppelin/contracts` sia installato correttamente
+   - Controllare che la versione di OpenZeppelin sia compatibile con la versione di Solidity in uso
 
-### Analisi dei contratti
+3. **Permessi VSCode**:
+   - Verificare che VSCode abbia i permessi necessari per accedere a Docker e alle risorse di sistema
+   - Se necessario, eseguire VSCode come amministratore
 
-Per lanciare l'analisi di un contratto, cliccare sul nome del file `<contratto>.sol` con il tasto destro > 'Mythril-VSC: Analyze File'.
+## 📈 Roadmap
 
-![Analisi dei contratti](images/analyze.png)
+- ✅ **Output configurabili**: supporto per diversi formati di output come JSON.
+- 🛠️ **Configurazioni avanzate**: maggiore configurabilità nella gestione dei comandi Mythril.
 
-In alternativa, se il contratto è aperto nell'editor, si può lanciare il comando 'Mythril-VSC: Analyze File' direttamente cliccando sull'icona in alto a destra come mostrato.
+## 🔗 Risorse
 
-![Analisi dei contratti da editor](images/analyze-from-editor.png)
+- [Documentazione Mythril](https://mythril.docs)
+- [Best Practices Solidity](https://consensys.github.io/smart-contract-best-practices/)
+- [OpenZeppelin Docs](https://docs.openzeppelin.com)
 
-### Impostazioni dell'estensione
+## 📄 Licenza
 
-Dalle impostazioni è possibile scegliere il tempo di esecuzione del processo di analisi del contratto.
-
-![Impostare tempo di esecuzione del processo](images/exec-timeout.png)
-
-## Roadmap
-
-Tra le funzionalità che intendo implementare ci sono:
-
-- nelle impostazioni: permettere all'utente di scegliere il tipo di output generato dall'analisi (ex. Json, Json + Webview o Markdown);
-
-- nel caso si scelga l'output 'Json + Webview', renderlo visibile con una [Webview](https://code.visualstudio.com/api/extension-guides/webview) aperta in una nuova tab di VSC;
-
-- Aggingere il supporto per gli **import** della libreria [OpenZeppelin](https://www.npmjs.com/package/@openzeppelin/contracts#usage).
-
-- nelle impostazioni: aggiungere ulteriori personalizzazioni per lanciare i comandi di Mythril.
-
-## To Dos
-
-- Studiare [altri metodi](https://code.visualstudio.com/api/extension-guides/overview) per rendere accessibili i comandi dalla UI.
-
-- Controllare le [linee guida per la UX](https://code.visualstudio.com/api/ux-guidelines/overview).
-
-- Migliorare l'icona dell'estensione.
+Questo progetto è rilasciato sotto licenza MIT. Vedi il file `LICENSE` per i dettagli.
