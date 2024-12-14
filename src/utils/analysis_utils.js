@@ -3,7 +3,6 @@
 const vscode = require('vscode');
 const Docker = require('dockerode');
 const docker = new Docker();
-const { isErrorOutput, formatOutput } = require('./format_utils');
 const { PassThrough } = require('stream');
 
 async function runDockerAnalysis(
@@ -56,7 +55,7 @@ async function runDockerAnalysis(
           `${fileNodeModulesUri.fsPath}:/tmp/node_modules`
         );
       } catch {
-        vscode.window.showWarningMessage(
+        console.warn(
           'node_modules non trovata. Gli import OpenZeppelin potrebbero non funzionare.'
         );
       }
@@ -155,10 +154,9 @@ async function runDockerAnalysis(
 
         progress.report({ message: 'Salvataggio dei risultati.' });
 
-        const formattedOutput = formatOutput(output);
         await vscode.workspace.fs.writeFile(
           outputUri,
-          Buffer.from(formattedOutput, 'utf8')
+          Buffer.from(output, 'utf8')
         );
 
         const document = await vscode.workspace.openTextDocument(outputUri);
