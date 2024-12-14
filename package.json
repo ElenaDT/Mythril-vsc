@@ -46,15 +46,15 @@
       ],
       "editor/title": [
         {
-          "command": "mythril-vsc.analyze",
-          "when": "resourceLangId == solidity",
+          "when": "resourceExtname == '.sol'",
           "group": "navigation",
+          "command": "mythril-vsc.analyze",
           "title": "Mythril-VSC: Analyze File"
         }
       ]
     },
     "configuration": {
-      "title": "Mythril-VSC Extension Settings",
+      "title": "Mythril-VSC Settings",
       "properties": {
         "mythril-vsc.executionTimeout": {
           "type": "number",
