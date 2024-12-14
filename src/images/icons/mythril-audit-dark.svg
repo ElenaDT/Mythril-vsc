@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Icona ottimizzata per sfondo nero -->
-<svg width="12" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-  <!-- Cornice esterna -->
-  <rect x="1" y="1" width="12" height="14" stroke="white" stroke-width="0.2" fill="none"/>
+<!-- Optimized icon for dark background -->
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer frame -->
+  <rect x="1" y="1" width="14" height="14" stroke="white" stroke-width="0.2" fill="none"/>
   
-  <!-- Linee orizzontali -->
-  <line x1="2" y1="3" x2="12" y2="3" stroke="white" stroke-width="0.5"/>
-  <line x1="2" y1="4.5" x2="12" y2="4.5" stroke="white" stroke-width="0.5"/>
+  <!-- Horizontal lines -->
+  <line x1="2" y1="3" x2="14" y2="3" stroke="white" stroke-width="0.5"/>
+  <line x1="2" y1="4.5" x2="14" y2="4.5" stroke="white" stroke-width="0.5"/>
   <line x1="2" y1="6.5" x2="8" y2="6.5" stroke="white" stroke-width="0.5"/>
-  <line x1="9" y1="6.5" x2="12" y2="6.5" stroke="white" stroke-width="0.5"/>
-  <line x1="2" y1="8.5" x2="12" y2="8.5" stroke="white" stroke-width="0.5"/>
-  <line x1="2" y1="10" x2="12" y2="10" stroke="white" stroke-width="0.5"/>
+  <line x1="9" y1="6.5" x2="14" y2="6.5" stroke="white" stroke-width="0.5"/>
+  <line x1="2" y1="8.5" x2="14" y2="8.5" stroke="white" stroke-width="0.5"/>
+  <line x1="2" y1="10" x2="14" y2="10" stroke="white" stroke-width="0.5"/>
 
-  
-  <!-- Ellisse modificata -->
-  <ellipse cx="10.1" cy="12.8" rx="2.5" ry="1.8" stroke="white" stroke-width="0.1" fill="none"/>
-  <circle cx="10.1" cy="12.8" r="0.6" stroke="white" stroke-width="0.5" fill="none"/>
+  <!-- Ellipse -->
+  <ellipse cx="12" cy="12.8" rx="2.5" ry="1.8" stroke="white" stroke-width="0.1" fill="none"/>
+  <circle cx="12" cy="12.8" r="0.6" stroke="white" stroke-width="0.5" fill="none"/>
 </svg>
