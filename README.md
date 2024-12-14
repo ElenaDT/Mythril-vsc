@@ -1,15 +1,24 @@
 # Mythril VSC - Analizzatore di Sicurezza per Smart Contract Solidity
 
-## 🛡️ **Panoramica**
+## **📄Panoramica**
 
-Mythril VSC è un'estensione di Visual Studio Code che integra il framework di analisi statica **Mythril**, progettato per rilevare vulnerabilità di sicurezza nei contratti Solidity.
+<table border="0">
+<tr>
+<td width="80%">
+Mythril VSC è un'estensione di Visual Studio Code che integra il framework di analisi statica <b>Mythril</b>, progettato per rilevare vulnerabilità di sicurezza nei contratti Solidity.
 Con questa estensione, è possibile eseguire analisi di sicurezza direttamente all'interno dell'editor, fornendo un'interfaccia intuitiva e rapida per analizzare i contratti.
+</td>
+<td>
+<img src="./src/images/mythril-audit-light.jpg" alt="Mythril VSC">
+</td>
+</tr>
+</table>
 
 ## ✨ **Caratteristiche Principali**
 
 - **🐳 Funziona in Ambiente Isolato**: utilizzo di Mythril in un container Docker per garantire un ambiente sicuro e indipendente per l'analisi.
 - **🚀 Integrazione con OpenZeppelin**: supporto nativo per le librerie più utilizzate nella sicurezza degli smart contract.
-- **🔍 Auto-detection Solidity**: rilevamento automatico della versione di Solidity del contratto
+- **🔍 **Auto**-detection Solidity**: rilevamento automatico della versione di Solidity del contratto
 - **⚙️ Configurazione Personalizzabile**: è possibile configurare l'estensione direttamente tramite le impostazioni di Visual Studio Code.
 - **📊 Report In Markdown**: genera report in formato Markdown per una facile lettura e condivisione dei risultati.
 
@@ -18,6 +27,28 @@ Con questa estensione, è possibile eseguire analisi di sicurezza direttamente a
 - **Visual Studio Code**
 - **Docker Desktop** (in esecuzione)
 - **Node.js** (versione 14 o superiore)
+
+## 🚀 **Guida Rapida**
+
+1. **Installazione dell'estensione**:
+
+   - Aprire VSCode
+   - Premere `Ctrl+Shift+X`
+   - Cercare "Mythril VSC" e installare
+
+2. **Preparazione dell'ambiente**:
+
+   - Verificare che Docker Desktop sia in esecuzione
+   - Aprire il file del contratto Solidity da analizzare
+
+3. **Avvio dell'analisi**:
+
+   - Click destro sul file del contratto
+   - Selezionare `Mythril-VSC: Analyze File`
+   - In alternativa, utilizzare l'icona 👁️ in alto a destra.
+
+4. **Visualizzazione dei risultati**:
+   - Il report dell'analisi si aprirà automaticamente in una nuova tab.
 
 ## 🛠️ Configurazione
 
@@ -58,4 +89,4 @@ Con questa estensione, è possibile eseguire analisi di sicurezza direttamente a
 
 ## 📄 Licenza
 
-Questo progetto è rilasciato sotto licenza MIT. Vedi il file `LICENSE` per i dettagli.
+Questo progetto è rilasciato sotto licenza MIT. Vedi il file [LICENSE](./LICENSE.txt) per i dettagli.
