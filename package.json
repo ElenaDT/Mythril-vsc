@@ -1,7 +1,7 @@
 {
   "name": "mythril-vsc",
-  "displayName": "Mythril-VSC",
-  "description": "Visual Studio Code extension to run Mythril analysis for Solidity files.",
+  "displayName": "Mythril for VSC",
+  "description": "Un'estensione per analizzare gli smart contract con Mythril in Visual Studio Code.",
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     "commands": [
       {
         "command": "mythril-vsc.analyze",
-        "title": "Mythril-VSC: Analyze File",
+        "title": "Analizza con Mythril for VSC",
         "icon": {
           "light": "./src/images/icons/mythril-audit-light.svg",
           "dark": "./src/images/icons/mythril-audit-dark.svg"
@@ -32,7 +32,12 @@
       {
         "command": "mythril-vsc.analyze",
         "key": "ctrl+m",
-        "when": "editorTextFocus"
+        "when": "editorTextFocus && isWindows"
+      },
+      {
+        "command": "mythril-vsc.analyze",
+        "key": "cmd+m",
+        "when": "editorTextFocus && !isWindows"
       }
     ],
     "menus": {
@@ -41,7 +46,7 @@
           "command": "mythril-vsc.analyze",
           "when": "resourceExtname == '.sol'",
           "group": "commands",
-          "title": "Mythril-VSC: Analyze File"
+          "title": "Analizza con Mythril for VSC"
         }
       ],
       "editor/title": [
@@ -49,22 +54,22 @@
           "when": "resourceExtname == '.sol'",
           "group": "navigation",
           "command": "mythril-vsc.analyze",
-          "title": "Mythril-VSC: Analyze File"
+          "title": "Analizza con Mythril for VSC"
         }
       ]
     },
     "configuration": {
-      "title": "Mythril-VSC Settings",
+      "title": "Mythril-VSC: Impostazioni",
       "properties": {
         "mythril-vsc.executionTimeout": {
           "type": "number",
           "default": 90,
-          "description": "The execution timeout in seconds for Mythril analysis. Only applicable if Execution Timeout Enabled is true."
+          "description": "Il timeout di esecuzione per le analisi con Mythril espresso in secondi."
         },
         "mythril-vsc.generateMappingsFile": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to generate a mappings file for Mythril analysis."
+          "description": "Scegliere se generare il file di mappatura per solc."
         }
       }
     }
