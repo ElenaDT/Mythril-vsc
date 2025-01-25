@@ -4,7 +4,7 @@ const vscode = require('vscode');
 const Docker = require('dockerode');
 const docker = new Docker();
 
-async function ensureDockerImage(imageName) {
+async function checkDockerImage(imageName) {
   try {
     await docker.ping();
   } catch (err) {
@@ -53,5 +53,5 @@ async function ensureDockerImage(imageName) {
 }
 
 module.exports = {
-  ensureDockerImage,
+  checkDockerImage,
 };

@@ -55,7 +55,6 @@ async function createMappingsFile(workspaceUri) {
   const mappingsContent = JSON.stringify(
     {
       optimizer: { enabled: true, runs: 200 },
-      viaIR: true,
       remappings: [
         '@openzeppelin/contracts/=/tmp/node_modules/@openzeppelin/contracts/',
         '@openzeppelin/=/tmp/node_modules/@openzeppelin/',

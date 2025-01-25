@@ -6,49 +6,49 @@ const {
   checkDependencies,
   createMappingsFile,
 } = require('./utils/fs_utils');
-const { ensureDockerImage } = require('./utils/docker_utils');
+const { checkDockerImage } = require('./utils/docker_utils');
 const { runDockerAnalysis } = require('./utils/analysis_utils');
 
-class MythrilAnalyzer {
+class Analyzer {
   constructor(context) {
     this.config = vscode.workspace.getConfiguration('mythril-vsc');
     this.context = context;
-    this.activeAnalysis = false;
+    this.isRunning = false;
   }
 
-  async analyze(sourceUri) {
-    if (this.activeAnalysis) {
+  async analyze(fileUri) {
+    if (this.isRunning) {
       vscode.window.showWarningMessage(
-        "Un'analisi è già in corso. Attendere il completamento o annullarla."
+        "Un'analisi è già in corso: attendere il completamento o annullarla."
       );
       return;
     }
 
-    this.activeAnalysis = true;
+    this.isRunning = true;
 
     try {
-      await checkDependencies(sourceUri);
+      await checkDependencies(fileUri);
 
-      const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
       if (!workspaceFolder) {
-        throw new Error('Nessuna cartella di lavoro trovata');
+        throw new Error('Nessuna cartella di lavoro trovata.');
       }
 
-      const fileName = sourceUri.path.split('/').pop();
+      const fileName = fileUri.path.split('/').pop();
       const outputUri = vscode.Uri.joinPath(
         workspaceFolder.uri,
         `${fileName}-output.md`
       );
 
-      const solcVersion = await getCompilerVersion(sourceUri);
+      const solcVersion = await getCompilerVersion(fileUri);
       const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
 
       const imageName = 'mythril/myth:latest';
-      await ensureDockerImage(imageName);
+      await checkDockerImage(imageName);
 
       const mappingsUri = await createMappingsFile(workspaceFolder.uri);
       await runDockerAnalysis(
-        sourceUri,
+        fileUri,
         outputUri,
         mappingsUri,
         solcFlag,
@@ -60,14 +60,14 @@ class MythrilAnalyzer {
       );
       console.error("Errore nella configurazione dell'analisi:", err);
     } finally {
-      this.activeAnalysis = false;
+      this.isRunning = false;
     }
   }
 }
 
 function activate(context) {
-  const analyzer = new MythrilAnalyzer(context);
-  const disposable = vscode.commands.registerCommand(
+  const analyzer = new Analyzer(context);
+  const analyzeCommand = vscode.commands.registerCommand(
     'mythril-vsc.analyze',
     async (fileUri) => {
       try {
@@ -87,7 +87,7 @@ function activate(context) {
       }
     }
   );
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(analyzeCommand);
 }
 
 module.exports = {

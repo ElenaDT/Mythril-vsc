@@ -84,23 +84,23 @@ async function runDockerAnalysis(
         });
 
         // Demultiplexing del flusso per separare stdout e stderr
-        const stdoutStream = new PassThrough();
-        const stderrStream = new PassThrough();
+        const stdout = new PassThrough();
+        const stderr = new PassThrough();
 
-        docker.modem.demuxStream(stream, stdoutStream, stderrStream);
+        docker.modem.demuxStream(stream, stdout, stderr);
 
-        stdoutStream.setEncoding('utf8');
-        stderrStream.setEncoding('utf8');
+        stdout.setEncoding('utf8');
+        stderr.setEncoding('utf8');
 
         let output = '';
         let errorOutput = '';
 
-        stdoutStream.on('data', (chunk) => {
+        stdout.on('data', (chunk) => {
           output += chunk;
           progress.report({ message: "Elaborazione dell'analisi..." });
         });
 
-        stderrStream.on('data', (chunk) => {
+        stderr.on('data', (chunk) => {
           errorOutput += chunk;
         });
 
