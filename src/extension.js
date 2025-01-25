@@ -59,6 +59,7 @@ class Analyzer {
       const mappingsUri = await createMappingsFile(workspaceFolder.uri);
       await runDockerAnalysis(
         fileUri,
+        fileName,
         outputUri,
         mappingsUri,
         solcFlag,
