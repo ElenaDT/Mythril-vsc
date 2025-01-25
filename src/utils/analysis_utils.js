@@ -6,14 +6,14 @@ const docker = new Docker();
 const { PassThrough } = require('stream');
 
 async function runDockerAnalysis(
-  sourceUri,
+  fileUri,
   outputUri,
   mappingsUri,
   solcFlag,
   config
 ) {
   const executionTimeout = config.get('executionTimeout', 60);
-  const fileName = sourceUri.path.split('/').pop();
+  const fileName = fileUri.path.split('/').pop();
 
   const containerOptions = {
     Image: 'mythril/myth:latest',
@@ -26,14 +26,14 @@ async function runDockerAnalysis(
     HostConfig: {
       AutoRemove: true,
       Binds: [
-        `${sourceUri.fsPath}:/tmp/${fileName}`,
+        `${fileUri.fsPath}:/tmp/${fileName}`,
         `${mappingsUri.fsPath}:/tmp/mappings.json`,
       ],
     },
     WorkingDir: '/tmp',
   };
 
-  const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+  const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
   if (workspaceFolder) {
     const nodeModulesUri = vscode.Uri.joinPath(
       workspaceFolder.uri,
@@ -46,7 +46,7 @@ async function runDockerAnalysis(
       );
     } catch {
       const fileNodeModulesUri = vscode.Uri.joinPath(
-        sourceUri.with({ path: sourceUri.path.replace(fileName, '') }),
+        fileUri.with({ path: fileUri.path.replace(fileName, '') }),
         'node_modules'
       );
       try {

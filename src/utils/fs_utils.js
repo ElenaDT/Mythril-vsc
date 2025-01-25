@@ -20,13 +20,13 @@ async function getCompilerVersion(uri) {
   }
 }
 
-async function checkDependencies(sourceUri) {
+async function checkDependencies(fileUri) {
   try {
-    const fileContent = await vscode.workspace.fs.readFile(sourceUri);
+    const fileContent = await vscode.workspace.fs.readFile(fileUri);
     const contentStr = Buffer.from(fileContent).toString('utf8');
 
     if (contentStr.includes('@openzeppelin')) {
-      const workspaceFolder = vscode.workspace.getWorkspaceFolder(sourceUri);
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
       if (!workspaceFolder) {
         throw new Error(
           'Nessuna cartella di lavoro trovata per il controllo delle dipendenze'
