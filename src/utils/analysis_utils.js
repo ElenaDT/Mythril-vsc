@@ -10,7 +10,8 @@ async function runDockerAnalysis(
   outputUri,
   mappingsUri,
   solcFlag,
-  config
+  config,
+  workspaceFolder
 ) {
   const executionTimeout = config.get('executionTimeout', 60);
   const fileName = fileUri.path.split('/').pop();
@@ -33,7 +34,6 @@ async function runDockerAnalysis(
     WorkingDir: '/tmp',
   };
 
-  const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
   if (workspaceFolder) {
     const nodeModulesUri = vscode.Uri.joinPath(
       workspaceFolder.uri,

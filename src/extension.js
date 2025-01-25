@@ -27,8 +27,8 @@ class Analyzer {
     this.isRunning = true;
 
     try {
-      await checkDependencies(fileUri);
-
+      const rawFileContent = await vscode.workspace.fs.readFile(fileUri);
+      const fileContent = Buffer.from(rawFileContent).toString('utf8');
       const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
       if (!workspaceFolder) {
         throw new Error('Nessuna cartella di lavoro trovata.');
@@ -39,11 +39,12 @@ class Analyzer {
         workspaceFolder.uri,
         `${fileName}-output.md`
       );
+      await checkDependencies(fileUri, fileContent, workspaceFolder);
 
-      const solcVersion = await getCompilerVersion(fileUri);
+      const solcVersion = await getCompilerVersion(fileUri, fileContent);
       const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
-
       const imageName = 'mythril/myth:latest';
+
       await checkDockerImage(imageName);
 
       const mappingsUri = await createMappingsFile(workspaceFolder.uri);
@@ -52,7 +53,8 @@ class Analyzer {
         outputUri,
         mappingsUri,
         solcFlag,
-        this.config
+        this.config,
+        workspaceFolder
       );
     } catch (err) {
       vscode.window.showErrorMessage(

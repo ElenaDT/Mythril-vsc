@@ -2,11 +2,9 @@
 
 const vscode = require('vscode');
 
-async function getCompilerVersion(uri) {
+async function getCompilerVersion(uri, fileContent) {
   try {
-    const fileContent = await vscode.workspace.fs.readFile(uri);
-    const fileContentStr = Buffer.from(fileContent).toString('utf8');
-    const pragmaLine = fileContentStr
+    const pragmaLine = fileContent
       .split('\n')
       .find((line) => line.startsWith('pragma solidity'));
 
@@ -20,32 +18,19 @@ async function getCompilerVersion(uri) {
   }
 }
 
-async function checkDependencies(fileUri) {
+async function checkDependencies(fileUri, fileContent, workspaceFolder) {
   try {
-    const fileContent = await vscode.workspace.fs.readFile(fileUri);
-    const contentStr = Buffer.from(fileContent).toString('utf8');
-
-    if (contentStr.includes('@openzeppelin')) {
-      const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
-      if (!workspaceFolder) {
-        throw new Error(
-          'Nessuna cartella di lavoro trovata per il controllo delle dipendenze'
-        );
-      }
-
-      const nodeModulesUri = vscode.Uri.joinPath(
-        workspaceFolder.uri,
-        'node_modules/@openzeppelin'
+    const nodeModulesUri = vscode.Uri.joinPath(
+      workspaceFolder.uri,
+      'node_modules/@openzeppelin'
+    );
+    try {
+      await vscode.workspace.fs.stat(nodeModulesUri);
+    } catch {
+      throw new Error(
+        'Dipendenze OpenZeppelin non trovate. Esegui "npm install".'
       );
-      try {
-        await vscode.workspace.fs.stat(nodeModulesUri);
-      } catch {
-        throw new Error(
-          'Dipendenze OpenZeppelin non trovate. Esegui "npm install".'
-        );
-      }
     }
-    return true;
   } catch (err) {
     throw new Error(`Controllo delle dipendenze fallito: ${err.message}`);
   }
