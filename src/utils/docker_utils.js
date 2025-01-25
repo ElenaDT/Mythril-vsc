@@ -25,27 +25,21 @@ async function checkDockerImage(imageName) {
       },
       async (progress) => {
         progress.report({ message: 'Download in corso.' });
+
+        const stream = await docker.pull(imageName);
+
         await new Promise((resolve, reject) => {
-          docker.pull(imageName, {}, (err, stream) => {
-            if (err) {
-              return reject(
-                new Error(
-                  `Impossibile scaricare l'immagine Docker: ${err.message}`
-                )
-              );
-            }
-            docker.modem.followProgress(
-              stream,
-              (err, res) => (err ? reject(err) : resolve(res)),
-              (event) => {
-                if (event.progress) {
-                  progress.report({
-                    message: `${event.status}: ${event.progress}`,
-                  });
-                }
+          docker.modem.followProgress(
+            stream,
+            (err, res) => (err ? reject(err) : resolve(res)),
+            (event) => {
+              if (event.progress) {
+                progress.report({
+                  message: `${event.status}: ${event.progress}`,
+                });
               }
-            );
-          });
+            }
+          );
         });
       }
     );
