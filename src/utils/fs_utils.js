@@ -18,21 +18,16 @@ async function getCompilerVersion(uri, fileContent) {
   }
 }
 
-async function checkDependencies(fileUri, fileContent, workspaceFolder) {
+async function checkDependencies(
+  fileUri,
+  fileContent,
+  workspaceFolder,
+  nodeModulesUri
+) {
   try {
-    const nodeModulesUri = vscode.Uri.joinPath(
-      workspaceFolder.uri,
-      'node_modules/@openzeppelin'
-    );
-    try {
-      await vscode.workspace.fs.stat(nodeModulesUri);
-    } catch {
-      throw new Error(
-        'Dipendenze OpenZeppelin non trovate. Esegui "npm install".'
-      );
-    }
-  } catch (err) {
-    throw new Error(`Controllo delle dipendenze fallito: ${err.message}`);
+    await vscode.workspace.fs.stat(nodeModulesUri);
+  } catch {
+    throw new Error('Cartella "node_modules" non trovata.');
   }
 }
 

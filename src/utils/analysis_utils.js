@@ -11,7 +11,8 @@ async function runDockerAnalysis(
   mappingsUri,
   solcFlag,
   config,
-  workspaceFolder
+  workspaceFolder,
+  nodeModulesUri
 ) {
   const executionTimeout = config.get('executionTimeout', 60);
   const fileName = fileUri.path.split('/').pop();
@@ -34,33 +35,9 @@ async function runDockerAnalysis(
     WorkingDir: '/tmp',
   };
 
-  if (workspaceFolder) {
-    const nodeModulesUri = vscode.Uri.joinPath(
-      workspaceFolder.uri,
-      'node_modules'
-    );
-    try {
-      await vscode.workspace.fs.stat(nodeModulesUri);
-      containerOptions.HostConfig.Binds.push(
-        `${nodeModulesUri.fsPath}:/tmp/node_modules`
-      );
-    } catch {
-      const fileNodeModulesUri = vscode.Uri.joinPath(
-        fileUri.with({ path: fileUri.path.replace(fileName, '') }),
-        'node_modules'
-      );
-      try {
-        await vscode.workspace.fs.stat(fileNodeModulesUri);
-        containerOptions.HostConfig.Binds.push(
-          `${fileNodeModulesUri.fsPath}:/tmp/node_modules`
-        );
-      } catch {
-        console.warn(
-          'node_modules non trovata. Gli import OpenZeppelin potrebbero non funzionare.'
-        );
-      }
-    }
-  }
+  containerOptions.HostConfig.Binds.push(
+    `${nodeModulesUri.fsPath}:/tmp/node_modules`
+  );
 
   await vscode.window.withProgress(
     {

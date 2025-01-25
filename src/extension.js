@@ -39,7 +39,16 @@ class Analyzer {
         workspaceFolder.uri,
         `${fileName}-output.md`
       );
-      await checkDependencies(fileUri, fileContent, workspaceFolder);
+      const nodeModulesUri = vscode.Uri.joinPath(
+        workspaceFolder.uri,
+        'node_modules'
+      );
+      await checkDependencies(
+        fileUri,
+        fileContent,
+        workspaceFolder,
+        nodeModulesUri
+      );
 
       const solcVersion = await getCompilerVersion(fileUri, fileContent);
       const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
@@ -54,7 +63,8 @@ class Analyzer {
         mappingsUri,
         solcFlag,
         this.config,
-        workspaceFolder
+        workspaceFolder,
+        nodeModulesUri
       );
     } catch (err) {
       vscode.window.showErrorMessage(
