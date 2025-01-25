@@ -35,9 +35,24 @@ async function runDockerAnalysis(
     WorkingDir: '/tmp',
   };
 
+  const handleCancellation = async (container) => {
+    if (container) {
+      vscode.window.showInformationMessage(
+        "Annullamento dell'analisi in corso. Attendere la conferma."
+      );
+      try {
+        await container.stop();
+        vscode.window.showInformationMessage(
+          'Analisi annullata correttamente.'
+        );
+      } catch (err) {
+        console.error("Errore durante l'annullamento del container:", err);
+      }
+    }
+  };
+
   const processToFollow = async (progress, token) => {
     let container;
-    let isCancelled = false;
 
     try {
       progress.report({ message: 'Creazione del container' });
@@ -72,29 +87,11 @@ async function runDockerAnalysis(
 
       await container.start();
 
-      token.onCancellationRequested(async () => {
-        if (container && !isCancelled) {
-          isCancelled = true;
-          vscode.window.showInformationMessage(
-            "Annullamento dell'analisi in corso. Attendere la conferma."
-          );
-          try {
-            await container.stop();
-            vscode.window.showInformationMessage(
-              'Analisi annullata con successo.'
-            );
-          } catch (err) {
-            console.error("Errore durante l'annullamento del container:", err);
-          }
-        }
-      });
+      token.onCancellationRequested(() => handleCancellation(container));
 
       const result = await container.wait();
 
-      if (isCancelled) {
-        return;
-      }
-
+      if (token.isCancellationRequested) return;
       if (errorOutput.trim()) {
         vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput}`);
         return;
@@ -114,7 +111,7 @@ async function runDockerAnalysis(
 
       vscode.window.showInformationMessage('Analisi completata con successo.');
     } catch (err) {
-      if (err.message !== 'canceled' && !isCancelled) {
+      if (err.message !== 'canceled' && !token.isCancellationRequested) {
         vscode.window.showErrorMessage(
           `Errore durante l'analisi: ${err.message}`
         );
