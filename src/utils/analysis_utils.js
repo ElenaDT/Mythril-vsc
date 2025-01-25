@@ -65,37 +65,33 @@ async function runDockerAnalysis(
         stderr: true,
       });
 
-      const stdout = new PassThrough();
-      const stderr = new PassThrough();
+      const stdOut = new PassThrough();
+      const stdErr = new PassThrough();
 
-      docker.modem.demuxStream(stream, stdout, stderr);
-
-      stdout.setEncoding('utf8');
-      stderr.setEncoding('utf8');
+      docker.modem.demuxStream(stream, stdOut, stdErr);
+      stdOut.setEncoding('utf8');
+      stdErr.setEncoding('utf8');
 
       let output = '';
       let errorOutput = '';
 
-      stdout.on('data', (chunk) => {
+      stdOut.on('data', (chunk) => {
         output += chunk;
         progress.report({ message: "Elaborazione dell'analisi..." });
       });
 
-      stderr.on('data', (chunk) => {
-        errorOutput += chunk;
+      stdErr.on('data', (chunk) => {
+        vscode.window.showErrorMessage(`Analisi fallita: ${chunk.trim()}`);
+        return;
       });
 
       await container.start();
 
       token.onCancellationRequested(() => handleCancellation(container));
 
-      const result = await container.wait();
+      await container.wait();
 
       if (token.isCancellationRequested) return;
-      if (errorOutput.trim()) {
-        vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput}`);
-        return;
-      }
 
       progress.report({ message: 'Salvataggio dei risultati.' });
 
