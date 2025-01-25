@@ -83,7 +83,6 @@ async function runDockerAnalysis(
           stderr: true,
         });
 
-        // Demultiplexing del flusso per separare stdout e stderr
         const stdout = new PassThrough();
         const stderr = new PassThrough();
 
@@ -126,15 +125,7 @@ async function runDockerAnalysis(
           }
         });
 
-        await new Promise((resolve, reject) => {
-          container.wait((err, data) => {
-            if (err && !isCancelled) {
-              reject(err);
-            } else {
-              resolve(data);
-            }
-          });
-        });
+        const result = await container.wait();
 
         if (isCancelled) {
           return;
@@ -142,13 +133,6 @@ async function runDockerAnalysis(
 
         if (errorOutput.trim()) {
           vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput}`);
-          return;
-        }
-
-        if (!output.trim()) {
-          vscode.window.showInformationMessage(
-            'Nessun problema trovato nel contratto.'
-          );
           return;
         }
 
