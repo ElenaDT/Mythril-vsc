@@ -52,13 +52,14 @@ const processToFollow = async (
     });
 
     stdErr.on('data', (chunk) => {
-      vscode.window.showErrorMessage(`Analisi fallita: ${chunk.trim()}`);
-      return;
+      errorOutput += chunk;
+      vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput.trim()}`);
     });
 
     await container.start();
     await container.wait();
-    if (token.isCancellationRequested) return;
+
+    if (token.isCancellationRequested || errorOutput.trim() !== '') return;
 
     progress.report({ message: 'Salvataggio dei risultati.' });
 
