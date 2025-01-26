@@ -16,7 +16,7 @@ module.exports = [
   {
     ...pluginJs.configs.recommended,
     rules: {
-      'no-console': false // Avvisa sull'uso di console.log
+      'no-console': 'off', // Non avvisa sull'uso di console.log
       'no-unused-vars': [
         'warn',
         { vars: 'all', args: 'after-used', ignoreRestSiblings: true },
