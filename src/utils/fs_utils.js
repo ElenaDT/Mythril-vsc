@@ -2,7 +2,7 @@
 
 const vscode = require('vscode');
 
-async function getCompilerVersion(uri, fileContent) {
+const getCompilerVersion = async (uri, fileContent) => {
   try {
     const pragmaLine = fileContent
       .split('\n')
@@ -16,22 +16,22 @@ async function getCompilerVersion(uri, fileContent) {
   } catch (err) {
     throw vscode.FileSystemError.FileNotFound(uri);
   }
-}
+};
 
-async function checkDependencies(
+const checkDependencies = async (
   fileUri,
   fileContent,
   workspaceFolder,
   nodeModulesUri
-) {
+) => {
   try {
     await vscode.workspace.fs.stat(nodeModulesUri);
   } catch {
     throw new Error('Cartella "node_modules" non trovata.');
   }
-}
+};
 
-async function createMappingsFile(workspaceUri) {
+const createMappingsFile = async (workspaceUri) => {
   const mappingsContent = JSON.stringify(
     {
       optimizer: { enabled: true, runs: 200 },
@@ -50,7 +50,7 @@ async function createMappingsFile(workspaceUri) {
     Buffer.from(mappingsContent, 'utf8')
   );
   return mappingsUri;
-}
+};
 
 module.exports = {
   getCompilerVersion,
