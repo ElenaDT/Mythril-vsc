@@ -14,7 +14,7 @@ let isRunning = false;
 const analyze = async (fileUri) => {
   if (isRunning) {
     vscode.window.showWarningMessage(
-      "Un'analisi è già in corso: attendere il completamento o annullarla."
+      'Un\'analisi è già in corso: attendere il completamento o annullarla.'
     );
     return;
   }
@@ -38,12 +38,7 @@ const analyze = async (fileUri) => {
       workspaceFolder.uri,
       'node_modules'
     );
-    await checkDependencies(
-      fileUri,
-      fileContent,
-      workspaceFolder,
-      nodeModulesUri
-    );
+    await checkDependencies(nodeModulesUri);
 
     const solcVersion = await getCompilerVersion(fileUri, fileContent);
     const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
@@ -59,14 +54,13 @@ const analyze = async (fileUri) => {
       mappingsUri,
       solcFlag,
       vscode.workspace.getConfiguration('mythril-vsc'),
-      workspaceFolder,
       nodeModulesUri
     );
   } catch (err) {
     vscode.window.showErrorMessage(
       `Configurazione dell'analisi fallita: ${err.message}`
     );
-    console.error("Errore nella configurazione dell'analisi:", err);
+    console.error('Errore nella configurazione dell\'analisi:', err);
   } finally {
     isRunning = false;
   }
@@ -89,7 +83,7 @@ const activate = (context) => {
         await analyze(uri);
       } catch (err) {
         vscode.window.showErrorMessage(`Mythril-VSC: ${err.message}`);
-        console.error("Errore durante l'analisi:", err);
+        console.error('Errore durante l\'analisi:', err);
       }
     }
   );

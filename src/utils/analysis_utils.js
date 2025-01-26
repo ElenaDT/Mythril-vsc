@@ -8,13 +8,13 @@ const { PassThrough } = require('stream');
 const handleCancellation = async (container) => {
   if (container) {
     vscode.window.showInformationMessage(
-      "Annullamento dell'analisi in corso. Attendere la conferma."
+      'Annullamento dell\'analisi in corso. Attendere la conferma.'
     );
     try {
       await container.stop();
       vscode.window.showInformationMessage('Analisi annullata correttamente.');
     } catch (err) {
-      console.error("Errore durante l'annullamento del container:", err);
+      console.error('Errore durante l\'annullamento del container:', err);
     }
   }
 };
@@ -33,7 +33,7 @@ const processToFollow = async (
     progress.report({ message: 'Creazione del container' });
     container = await docker.createContainer(containerOptions);
 
-    progress.report({ message: "Avvio dell'analisi..." });
+    progress.report({ message: 'Avvio dell\'analisi...' });
 
     const stream = await container.attach({
       stream: true,
@@ -48,7 +48,7 @@ const processToFollow = async (
 
     stdOut.on('data', (chunk) => {
       output += chunk;
-      progress.report({ message: "Elaborazione dell'analisi..." });
+      progress.report({ message: 'Elaborazione dell\'analisi...' });
     });
 
     stdErr.on('data', (chunk) => {
@@ -59,7 +59,7 @@ const processToFollow = async (
     await container.start();
     await container.wait();
 
-    if (token.isCancellationRequested || errorOutput.trim() !== '') return;
+    if (token.isCancellationRequested || errorOutput.trim() !== '') {return;}
 
     progress.report({ message: 'Salvataggio dei risultati.' });
 
@@ -76,7 +76,7 @@ const processToFollow = async (
       vscode.window.showErrorMessage(
         `Errore durante l'analisi: ${err.message}`
       );
-      console.error("Errore durante l'analisi:", err);
+      console.error('Errore durante l\'analisi:', err);
     }
   }
 };
@@ -99,7 +99,6 @@ const runDockerAnalysis = async (
   mappingsUri,
   solcFlag,
   config,
-  workspaceFolder,
   nodeModulesUri
 ) => {
   const executionTimeout = config.get('executionTimeout', 60);

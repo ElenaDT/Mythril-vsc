@@ -7,7 +7,7 @@ const docker = new Docker();
 const checkDockerImage = async (imageName) => {
   try {
     await docker.ping();
-  } catch (err) {
+  } catch {
     throw new Error('Docker non è in esecuzione. Per favore, avvia Docker.');
   }
 

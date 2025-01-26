@@ -13,17 +13,12 @@ const getCompilerVersion = async (uri, fileContent) => {
       return versionRange.replace(/[^0-9.]/g, '').trim();
     }
     return false;
-  } catch (err) {
+  } catch {
     throw vscode.FileSystemError.FileNotFound(uri);
   }
 };
 
-const checkDependencies = async (
-  fileUri,
-  fileContent,
-  workspaceFolder,
-  nodeModulesUri
-) => {
+const checkDependencies = async (nodeModulesUri) => {
   try {
     await vscode.workspace.fs.stat(nodeModulesUri);
   } catch {
