@@ -40,7 +40,7 @@ const analyze = async (fileUri) => {
     );
     await checkDependencies(nodeModulesUri);
 
-    const solcVersion = await getCompilerVersion(fileUri, fileContent);
+    const solcVersion = await getCompilerVersion(fileContent);
     const solcFlag = solcVersion ? `--solv ${solcVersion}` : '';
     const imageName = 'mythril/myth:latest';
 

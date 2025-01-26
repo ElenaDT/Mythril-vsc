@@ -2,20 +2,16 @@
 
 const vscode = require('vscode');
 
-const getCompilerVersion = async (uri, fileContent) => {
-  try {
-    const pragmaLine = fileContent
-      .split('\n')
-      .find((line) => line.startsWith('pragma solidity'));
+const getCompilerVersion = async (fileContent) => {
+  const pragmaLine = fileContent
+    .split('\n')
+    .find((line) => line.startsWith('pragma solidity'));
 
-    if (pragmaLine) {
-      const versionRange = pragmaLine.split(' ')[2];
-      return versionRange.replace(/[^0-9.]/g, '').trim();
-    }
-    return false;
-  } catch {
-    throw vscode.FileSystemError.FileNotFound(uri);
+  if (pragmaLine) {
+    const versionRange = pragmaLine.split(' ')[2];
+    return versionRange.replace(/[^0-9.]/g, '').trim();
   }
+  return false;
 };
 
 const checkDependencies = async (nodeModulesUri) => {

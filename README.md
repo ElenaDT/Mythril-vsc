@@ -24,9 +24,8 @@ Con questa estensione, è possibile eseguire analisi di sicurezza direttamente a
 
 ## 🔧 **Requisiti di Sistema**
 
-- **Visual Studio Code**
+- **Visual Studio Code** (versione ^1.89.0")
 - **Docker Desktop** (in esecuzione)
-- **Node.js** (versione 14 o superiore)
 
 ## 🚀 **Guida Rapida**
 
@@ -45,7 +44,7 @@ Con questa estensione, è possibile eseguire analisi di sicurezza direttamente a
 
    - Click destro sul file del contratto
    - Selezionare `Mythril-VSC: Analyze File`
-   - In alternativa, utilizzare l'icona 👁️ in alto a destra.
+   - In alternativa, utilizzare l'icona 👁️ in alto a destra o la combinazine di tasti "ctrl\cmd + m".
 
 4. **Visualizzazione dei risultati**:
    - Il report dell'analisi si aprirà automaticamente in una nuova tab.
@@ -67,10 +66,10 @@ Con questa estensione, è possibile eseguire analisi di sicurezza direttamente a
    - Verificare che Docker Desktop sia in esecuzione
    - Controllare i permessi di Docker e che non ci siano conflitti di rete
 
-2. **Errori con OpenZeppelin**:
+2. **Errori di solc**:
 
-   - Assicurarsi che il pacchetto `@openzeppelin/contracts` sia installato correttamente
-   - Controllare che la versione di OpenZeppelin sia compatibile con la versione di Solidity in uso
+   - Assicurarsi che il pacchetto `@openzeppelin/contracts` sia installato correttamente.
+   - Controllare che i file importati abbiano una versione di solc compatibile con quella del contratto da analizzare.
 
 3. **Permessi VSCode**:
    - Verificare che VSCode abbia i permessi necessari per accedere a Docker e alle risorse di sistema

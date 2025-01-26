@@ -63,13 +63,8 @@
       "properties": {
         "mythril-vsc.executionTimeout": {
           "type": "number",
-          "default": 90,
+          "default": 60,
           "description": "Il timeout di esecuzione per le analisi con Mythril espresso in secondi."
-        },
-        "mythril-vsc.generateMappingsFile": {
-          "type": "boolean",
-          "default": true,
-          "description": "Scegliere se generare il file di mappatura per solc."
         }
       }
     }
