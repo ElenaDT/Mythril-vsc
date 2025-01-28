@@ -37,7 +37,7 @@ const processToFollow = async (progress, token, containerOptions, outputUri) => 
 
     progress.report({ message: 'Avvio dell\'analisi...' });
     const stream = await container.attach({ stream: true, stdout: true, stderr: true });
-    const { stdOut, stdErr } = await demultiplexStream(stream);
+    const { stdOut, stdErr } = demultiplexStream(stream);
 
     let output = '';
     let errorOutput = '';

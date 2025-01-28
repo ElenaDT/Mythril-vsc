@@ -73,14 +73,7 @@ const activate = (context) => {
     async (fileUri) => {
       try {
         const uri = fileUri || vscode.window.activeTextEditor?.document.uri;
-        if (!uri) {
-          throw new Error('Nessun file selezionato');
-        }
-        if (!uri.path.endsWith('.sol')) {
-          throw new Error(
-            'Questo comando è disponibile solo per file Solidity (.sol)'
-          );
-        }
+    
         await analyze(uri);
       } catch (err) {
         vscode.window.showErrorMessage(`Mythril-VSC: ${err.message}`);
