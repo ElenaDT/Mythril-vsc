@@ -61,7 +61,6 @@ const analyze = async (fileUri) => {
     vscode.window.showErrorMessage(
       `Configurazione dell'analisi fallita: ${err.message}`
     );
-    console.error('Errore nella configurazione dell\'analisi:', err);
   } finally {
     isRunning = false;
   }
