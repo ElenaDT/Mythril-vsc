@@ -1,6 +1,7 @@
 'use strict';
 
 const vscode = require('vscode');
+const path = require('path');
 const {
   getCompilerVersion,
   checkDependencies,
@@ -29,7 +30,7 @@ const analyze = async (fileUri) => {
       throw new Error('Nessuna cartella di lavoro trovata.');
     }
 
-    const fileName = fileUri.path.split('/').pop();
+    const fileName = path.basename(fileUri.path);
     const outputUri = vscode.Uri.joinPath(
       workspaceFolder.uri,
       `${fileName}-output.md`

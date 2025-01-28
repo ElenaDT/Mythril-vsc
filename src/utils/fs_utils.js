@@ -2,7 +2,7 @@
 
 const vscode = require('vscode');
 
-const getCompilerVersion = async (fileContent) => {
+const getCompilerVersion = (fileContent) => {
   const pragmaLine = fileContent
     .split('\n')
     .find((line) => line.startsWith('pragma solidity'));

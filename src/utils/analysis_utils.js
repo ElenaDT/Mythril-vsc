@@ -14,7 +14,9 @@ const handleCancellation = async (container) => {
       await container.stop();
       vscode.window.showInformationMessage('Analisi annullata correttamente.');
     } catch (err) {
-      console.error('Errore durante l\'annullamento del container:', err);
+      vscode.window.showErrorMessage(
+        `Errore durante l'annullamento dell'analisi: ${err.message}`
+      );
     }
   }
 };
@@ -27,11 +29,11 @@ const processToFollow = async (
 ) => {
   let container;
 
-  token.onCancellationRequested(() => handleCancellation(container));
-
   try {
     progress.report({ message: 'Creazione del container' });
     container = await docker.createContainer(containerOptions);
+
+    token.onCancellationRequested(() => handleCancellation(container));
 
     progress.report({ message: 'Avvio dell\'analisi...' });
 
@@ -51,16 +53,17 @@ const processToFollow = async (
       progress.report({ message: 'Elaborazione dell\'analisi...' });
     });
 
-    stdErr.on('data', (chunk) => {
-      errorOutput += chunk;
-      vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput.trim()}`);
-    });
+    stdErr.on('data', (chunk) => errorOutput += chunk);
 
     await container.start();
     await container.wait();
 
-    if (token.isCancellationRequested || errorOutput.trim() !== '') {return;}
+    if (token.isCancellationRequested) {return;}
 
+    if (errorOutput.trim() !== '') {
+      vscode.window.showErrorMessage(`Analisi fallita: ${errorOutput.trim()}`);
+      return;
+    }    
     progress.report({ message: 'Salvataggio dei risultati.' });
 
     await vscode.workspace.fs.writeFile(outputUri, Buffer.from(output, 'utf8'));
@@ -72,16 +75,15 @@ const processToFollow = async (
 
     vscode.window.showInformationMessage('Analisi completata con successo.');
   } catch (err) {
-    if (err.message !== 'canceled' && !token.isCancellationRequested) {
+    if (!token.isCancellationRequested) {
       vscode.window.showErrorMessage(
         `Errore durante l'analisi: ${err.message}`
       );
-      console.error('Errore durante l\'analisi:', err);
     }
   }
 };
 
-const demultiplexStream = async (stream) => {
+const demultiplexStream = (stream) => {
   const stdOut = new PassThrough();
   const stdErr = new PassThrough();
 

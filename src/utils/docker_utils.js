@@ -12,7 +12,7 @@ const checkDockerImage = async (imageName) => {
   }
 
   const images = await docker.listImages();
-  const imageExists = images.some((image) =>
+  const imageExists = images.some(image =>
     image.RepoTags?.includes(imageName)
   );
 
@@ -31,7 +31,7 @@ const checkDockerImage = async (imageName) => {
         await new Promise((resolve, reject) => {
           docker.modem.followProgress(
             stream,
-            (err, res) => (err ? reject(err) : resolve(res)),
+            (err, res) => err ? reject(err) : resolve(res),
             (event) => {
               if (event.progress) {
                 progress.report({
