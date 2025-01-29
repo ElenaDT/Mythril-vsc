@@ -69,10 +69,9 @@ const analyze = async (fileUri) => {
 const activate = (context) => {
   const analyzeCommand = vscode.commands.registerCommand(
     'mythril-vsc.analyze',
-    async (fileUri) => {
+    async () => {
       try {
-        const uri = fileUri || vscode.window.activeTextEditor?.document.uri;
-    
+        const uri = vscode.window.activeTextEditor?.document.uri;
         await analyze(uri);
       } catch (err) {
         vscode.window.showErrorMessage(`Mythril-VSC: ${err.message}`);
