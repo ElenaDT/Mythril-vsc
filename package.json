@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ElenaDT/Tesi_code.git"
+    "url": "https://github.com/ElenaDT/Mythril-vsc.git"
   },
   "engines": {
     "vscode": "^1.89.0"
