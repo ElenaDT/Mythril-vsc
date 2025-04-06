@@ -85,7 +85,7 @@
   },
   "devDependencies": {
     "eslint": "^9.9.0",
-    "dockerode": "^4.0.2",
+    "dockerode": "^4.0.5",
     "globals": "^15.8.0"
   }
 }
