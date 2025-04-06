@@ -12,12 +12,6 @@ node_modules
 # File di distribuzione
 *.vsix
 
-# File di output
-*.md
-*.json
-
-!README.md
-
 # File generati automaticamente
 *.log
 *.lock
@@ -38,12 +32,10 @@ out/
 .vscode-insiders/
 .vscode-preview/
 
-# Cartelle di output
-.mythril/
-
 # Altro
 .DS_Store
 Thumbs.db
 eslint.config.mjs
 .solcx-lock-*
 .prettierrc
+.qodo
