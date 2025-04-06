@@ -1,12 +1,8 @@
-# Mythril VSC - Security Analyzer for Solidity Smart Contracts
-
-<div align="center">
-  <img src="./src/images/mythril-audit-light.jpg" alt="Mythril VSC" width="200">
-</div>
+# Mythril for VSC - Security Analyzer for Solidity Smart Contracts
 
 ## 📄 Overview
 
-Mythril VSC is a Visual Studio Code extension that integrates the **Mythril** static analysis framework, designed to detect security vulnerabilities in Solidity contracts. With this extension, you can run security analyses directly within your editor, providing an intuitive and quick interface for analyzing contracts.
+Mythril VSC is a Visual Studio Code extension that integrates the [**Mythril**](https://github.com/ConsenSysDiligence/mythril) static analysis framework, designed to detect security vulnerabilities in Solidity contracts. With this extension, you can run security analyses directly within your editor, providing an intuitive and quick interface for analyzing contracts.
 
 ## ✨ Key Features
 
@@ -70,8 +66,20 @@ You can customize the extension settings by modifying the VSCode settings.json f
 
 ## 📈 Roadmap
 
-- ✅ **Configurable outputs**: Support for different output formats such as JSON
-- 🛠️ **Advanced configurations**: More configurability in managing Mythril commands
+- 🔤 **Choose a Better Name**: Select a more descriptive and appealing name for the extension
+- 🖼️ **Pre-Analysis UI**: Implement a user interface to configure specific parameters before starting an analysis
+- ⌨️ **Customizable Keybindings**: Allow users to configure keybindings for initiating analyses
+- ✅ **Configurable Outputs**: Support various output formats, such as JSON
+- 🛠️ **Advanced Mythril Features**: Integrate all [Mythril's advanced features](https://mythril-classic.readthedocs.io/en/master/security-analysis.html)
+- 🔗 **Bytecode Analysis**: Enable analysis of compiled bytecode
+- 🐳 **Custom Docker Images**: Provide an option to use custom Docker images for running Mythril
+- 📝 **TypeScript and JSDoc Integration**: Enhance code maintainability and documentation
+- 🖥️ **ARM-64 Architecture Support**: Ensure compatibility with ARM-64 architecture for Docker images
+- 📚 **Library Auto-detection**: Automatically detect libraries used in contracts, beyond just OpenZeppelin
+- ⚡ **Concurrent Analyses**: Enable running multiple analyses in parallel processes
+- 🌍 **Internationalization (i18n)**: Add support for multiple languages
+- 🧪 **Integration Tests**: Add [integration tests](https://code.visualstudio.com/api/working-with-extensions/testing-extension) to ensure reliability
+- 🎨 **UX Testing**: Conduct user experience testing to improve usability
 
 ## 🔗 Resources
 

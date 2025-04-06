@@ -58,6 +58,7 @@ Enhancement suggestions are tracked as GitHub issues. Create an issue and provid
 
 * Use [Markdown](https://daringfireball.net/projects/markdown)
 * Reference methods and classes in markdown with the custom {} notation:
-    * Reference classes with {ClassName}
-    * Reference instance methods with {ClassName#methodName}
-    * Reference class methods with {ClassName.methodName}
+  
+  * Reference classes with {ClassName}
+  * Reference instance methods with {ClassName#methodName}
+  * Reference class methods with {ClassName.methodName}
