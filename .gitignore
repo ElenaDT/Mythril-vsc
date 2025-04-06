@@ -2,9 +2,6 @@ node_modules
 
 # File e cartelle di Visual Studio Code
 .vscode/
-Contracts_test/.vscode/
-
-!Contracts_test/
 
 # File di compilazione
 *.exe
@@ -14,12 +11,6 @@ Contracts_test/.vscode/
 
 # File di distribuzione
 *.vsix
-
-# File di output
-*.md
-*.json
-
-!README.md
 
 # File generati automaticamente
 *.log
@@ -41,12 +32,10 @@ out/
 .vscode-insiders/
 .vscode-preview/
 
-# Cartelle di output
-.mythril/
-
 # Altro
 .DS_Store
 Thumbs.db
 eslint.config.mjs
 .solcx-lock-*
 .prettierrc
+.qodo
