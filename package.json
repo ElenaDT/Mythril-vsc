@@ -1,21 +1,73 @@
 {
   "name": "mythril-vsc",
-  "displayName": "Mythril-VSC",
-  "description": "",
+  "displayName": "Mythril for VSC",
+  "description": "Un'estensione per analizzare gli smart contract con Mythril in Visual Studio Code.",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElenaDT/Tesi_code.git"
+  },
   "engines": {
     "vscode": "^1.89.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
-  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:extension.mythril-vsc.analyze"
+  ],
+  "main": "./src/extension.js",
   "contributes": {
-    "commands": [{
-      "command": "mythril-vsc.helloWorld",
-      "title": "Hello World"
-    }]
+    "commands": [
+      {
+        "command": "mythril-vsc.analyze",
+        "title": "Analizza con Mythril for VSC",
+        "icon": {
+          "light": "./src/images/icons/mythril-audit-light.svg",
+          "dark": "./src/images/icons/mythril-audit-dark.svg"
+        }
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "mythril-vsc.analyze",
+        "key": "ctrl+m",
+        "when": "editorTextFocus && isWindows"
+      },
+      {
+        "command": "mythril-vsc.analyze",
+        "key": "cmd+m",
+        "when": "editorTextFocus && !isWindows"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "mythril-vsc.analyze",
+          "when": "resourceExtname == '.sol'",
+          "group": "commands",
+          "title": "Analizza con Mythril for VSC"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceExtname == '.sol'",
+          "group": "navigation",
+          "command": "mythril-vsc.analyze",
+          "title": "Analizza con Mythril for VSC"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Mythril-VSC: Impostazioni",
+      "properties": {
+        "mythril-vsc.executionTimeout": {
+          "type": "number",
+          "default": 60,
+          "description": "Il timeout di esecuzione per le analisi con Mythril espresso in secondi."
+        }
+      }
+    }
   },
   "scripts": {
     "lint": "eslint .",
@@ -23,12 +75,8 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.89.0",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "18.x",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5",
-    "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.3.9"
+    "eslint": "^9.9.0",
+    "dockerode": "^4.0.2",
+    "globals": "^15.8.0"
   }
 }

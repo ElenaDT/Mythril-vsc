@@ -1,65 +1,91 @@
-# mythril-vsc README
+# Mythril VSC - Analizzatore di Sicurezza per Smart Contract Solidity
 
-This is the README for your extension "mythril-vsc". After writing up a brief description, we recommend including the following sections.
+## **📄Panoramica**
 
-## Features
+<table border="0">
+<tr>
+<td width="80%">
+Mythril VSC è un'estensione di Visual Studio Code che integra il framework di analisi statica <b>Mythril</b>, progettato per rilevare vulnerabilità di sicurezza nei contratti Solidity.
+Con questa estensione, è possibile eseguire analisi di sicurezza direttamente all'interno dell'editor, fornendo un'interfaccia intuitiva e rapida per analizzare i contratti.
+</td>
+<td>
+<img src="./src/images/mythril-audit-light.jpg" alt="Mythril VSC">
+</td>
+</tr>
+</table>
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## ✨ **Caratteristiche Principali**
 
-For example if there is an image subfolder under your extension project workspace:
+- **🐳 Funziona in Ambiente Isolato**: utilizzo di Mythril in un container Docker per garantire un ambiente sicuro e indipendente per l'analisi.
+- **🚀 Integrazione con OpenZeppelin**: supporto nativo per le librerie più utilizzate nella sicurezza degli smart contract.
+- **🔍 **Auto**-detection Solidity**: rilevamento automatico della versione di Solidity del contratto
+- **⚙️ Configurazione Personalizzabile**: è possibile configurare l'estensione direttamente tramite le impostazioni di Visual Studio Code.
+- **📊 Report In Markdown**: genera report in formato Markdown per una facile lettura e condivisione dei risultati.
 
-\!\[feature X\]\(images/feature-x.png\)
+## 🔧 **Requisiti di Sistema**
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- **Visual Studio Code** (versione ^1.89.0")
+- **Docker Desktop** (in esecuzione)
 
-## Requirements
+## 🚀 **Guida Rapida**
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. **Installazione dell'estensione**:
 
-## Extension Settings
+   - Aprire VSCode
+   - Premere `Ctrl+Shift+X`
+   - Cercare "Mythril VSC" e installare
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+2. **Preparazione dell'ambiente**:
 
-For example:
+   - Verificare che Docker Desktop sia in esecuzione
+   - Aprire il file del contratto Solidity da analizzare
 
-This extension contributes the following settings:
+3. **Avvio dell'analisi**:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+   - Click destro sul file del contratto
+   - Selezionare `Mythril-VSC: Analyze File`
+   - In alternativa, utilizzare l'icona 👁️ in alto a destra o la combinazine di tasti "ctrl\cmd + m".
 
-## Known Issues
+4. **Visualizzazione dei risultati**:
+   - Il report dell'analisi si aprirà automaticamente in una nuova tab.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## 🛠️ Configurazione
 
-## Release Notes
+È possibile personalizzare le impostazioni dell'estensione modificando il file settings.json di VSCode:
 
-Users appreciate release notes as you update your extension.
+```json
+{
+  "mythril-vsc.executionTimeout": 60 // Timeout in secondi per l'analisi
+}
+```
 
-### 1.0.0
+## 🐛 Problemi Comuni
 
-Initial release of ...
+1. **Docker non risponde**:
 
-### 1.0.1
+   - Verificare che Docker Desktop sia in esecuzione
+   - Controllare i permessi di Docker e che non ci siano conflitti di rete
 
-Fixed issue #.
+2. **Errori di solc**:
 
-### 1.1.0
+   - Assicurarsi che il pacchetto `@openzeppelin/contracts` sia installato correttamente.
+   - Controllare che i file importati abbiano una versione di solc compatibile con quella del contratto da analizzare.
 
-Added features X, Y, and Z.
+3. **Permessi VSCode**:
+   - Verificare che VSCode abbia i permessi necessari per accedere a Docker e alle risorse di sistema
+   - Se necessario, eseguire VSCode come amministratore
 
----
+## 📈 Roadmap
 
-## Working with Markdown
+- ✅ **Output configurabili**: supporto per diversi formati di output come JSON.
+- 🛠️ **Configurazioni avanzate**: maggiore configurabilità nella gestione dei comandi Mythril.
 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+## 🔗 Risorse
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
+- [Documentazione Mythril](https://mythril.docs)
+- [Best Practices Solidity](https://consensys.github.io/smart-contract-best-practices/)
+- [OpenZeppelin Docs](https://docs.openzeppelin.com)
 
-## For more information
+## 📄 Licenza
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Questo progetto è rilasciato sotto licenza MIT. Vedi il file [LICENSE](./LICENSE.txt) per i dettagli.

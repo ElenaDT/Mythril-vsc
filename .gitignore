@@ -1,3 +1,52 @@
 node_modules
-.vscode-test/
+
+# File e cartelle di Visual Studio Code
+.vscode/
+Contracts_test/.vscode/
+
+!Contracts_test/
+
+# File di compilazione
+*.exe
+*.dll
+*.so
+*.dylib
+
+# File di distribuzione
 *.vsix
+
+# File di output
+*.md
+*.json
+
+!README.md
+
+# File generati automaticamente
+*.log
+*.lock
+*.tmp
+
+# File di backup
+*~
+*.bak
+*.swp
+
+# Cartelle di compilazione
+build/
+dist/
+out/
+
+# Cartelle di sviluppo
+.vscode-test/
+.vscode-insiders/
+.vscode-preview/
+
+# Cartelle di output
+.mythril/
+
+# Altro
+.DS_Store
+Thumbs.db
+eslint.config.mjs
+.solcx-lock-*
+.prettierrc
