@@ -2,9 +2,6 @@ node_modules
 
 # File e cartelle di Visual Studio Code
 .vscode/
-Contracts_test/.vscode/
-
-!Contracts_test/
 
 # File di compilazione
 *.exe

@@ -1,7 +1,7 @@
 {
   "name": "mythril-vsc",
   "displayName": "Mythril for VSC",
-  "description": "Un'estensione per analizzare gli smart contract con Mythril in Visual Studio Code.",
+  "description": "An extension to analyze smart contracts with Mythril in Visual Studio Code.",
   "version": "0.0.1",
   "repository": {
     "type": "git",
