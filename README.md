@@ -1,23 +1,23 @@
 # Mythril for VSC - Security Analyzer for Solidity Smart Contracts
 
-## 📄 Overview
+## Overview
 
 Mythril VSC is a Visual Studio Code extension that integrates the [**Mythril**](https://github.com/ConsenSysDiligence/mythril) static analysis framework, designed to detect security vulnerabilities in Solidity contracts. With this extension, you can run security analyses directly within your editor, providing an intuitive and quick interface for analyzing contracts.
 
-## ✨ Key Features
+## Key Features
 
-- **🐳 Isolated Environment**: Uses Mythril in a Docker container to ensure a secure and independent environment for analysis
-- **🚀 OpenZeppelin Integration**: Native support for the most widely used smart contract security libraries
-- **🔍 Solidity Auto-detection**: Automatic detection of the contract's Solidity version
-- **⚙️ Customizable Configuration**: Configure the extension directly through Visual Studio Code settings
-- **📊 Markdown Reports**: Generates reports in Markdown format for easy reading and sharing of results
+- **Isolated Environment**: Uses Mythril in a Docker container to ensure a secure and independent environment for analysis
+- **OpenZeppelin Integration**: Native support for the most widely used smart contract security libraries
+- **Solidity Auto-detection**: Automatic detection of the contract's Solidity version
+- **Customizable Configuration**: Configure the extension directly through Visual Studio Code settings
+- **Markdown Reports**: Generates reports in Markdown format for easy reading and sharing of results
 
-## 🔧 System Requirements
+## System Requirements
 
 - **Visual Studio Code** (version ^1.89.0)
 - **Docker Desktop** (running)
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Installation
 
@@ -40,7 +40,7 @@ Mythril VSC is a Visual Studio Code extension that integrates the [**Mythril**](
 
 - The analysis report will automatically open in a new tab
 
-## 🛠️ Configuration
+## Configuration
 
 You can customize the extension settings by modifying the VSCode settings.json file:
 
@@ -50,7 +50,7 @@ You can customize the extension settings by modifying the VSCode settings.json f
 }
 ```
 
-## 🐛 Common Issues
+## Common Issues
 
 1. **Docker not responding**:
    - Verify that Docker Desktop is running
@@ -64,33 +64,33 @@ You can customize the extension settings by modifying the VSCode settings.json f
    - Verify that VSCode has the necessary permissions to access Docker and system resources
    - If necessary, run VSCode as administrator
 
-## 📈 Roadmap
+## Roadmap
 
-- 🔤 **Choose a Better Name**: Select a more descriptive and appealing name for the extension
-- 🖼️ **Pre-Analysis UI**: Implement a user interface to configure specific parameters before starting an analysis
-- ⌨️ **Customizable Keybindings**: Allow users to configure keybindings for initiating analyses
-- ✅ **Configurable Outputs**: Support various output formats, such as JSON
-- 🛠️ **Advanced Mythril Features**: Integrate all [Mythril's advanced features](https://mythril-classic.readthedocs.io/en/master/security-analysis.html)
-- 🔗 **Bytecode Analysis**: Enable analysis of compiled bytecode
-- 🐳 **Custom Docker Images**: Provide an option to use custom Docker images for running Mythril
-- 📝 **TypeScript and JSDoc Integration**: Enhance code maintainability and documentation
-- 🖥️ **ARM-64 Architecture Support**: Ensure compatibility with ARM-64 architecture for Docker images
-- 📚 **Library Auto-detection**: Automatically detect libraries used in contracts, beyond just OpenZeppelin
-- ⚡ **Concurrent Analyses**: Enable running multiple analyses in parallel processes
-- 🌍 **Internationalization (i18n)**: Add support for multiple languages
-- 🧪 **Integration Tests**: Add [integration tests](https://code.visualstudio.com/api/working-with-extensions/testing-extension) to ensure reliability
-- 🎨 **UX Testing**: Conduct user experience testing to improve usability
+- **Choose a Better Name**: Select a more descriptive and appealing name for the extension
+- **Pre-Analysis UI**: Implement a user interface to configure specific parameters before starting an analysis
+- **Customizable Keybindings**: Allow users to configure keybindings for initiating analyses
+- **Configurable Outputs**: Support various output formats, such as JSON
+- **Advanced Mythril Features**: Integrate all [Mythril's advanced features](https://mythril-classic.readthedocs.io/en/master/security-analysis.html)
+- **Bytecode Analysis**: Enable analysis of compiled bytecode
+- **Custom Docker Images**: Provide an option to use custom Docker images for running Mythril
+- **TypeScript and JSDoc Integration**: Enhance code maintainability and documentation
+- **ARM-64 Architecture Support**: Ensure compatibility with ARM-64 architecture for Docker images
+- **Library Auto-detection**: Automatically detect libraries used in contracts, beyond just OpenZeppelin
+- **Concurrent Analyses**: Enable running multiple analyses in parallel processes
+- **Internationalization (i18n)**: Add support for multiple languages
+- **Integration Tests**: Add [integration tests](https://code.visualstudio.com/api/working-with-extensions/testing-extension) to ensure reliability
+- **UX Testing**: Conduct user experience testing to improve usability
 
-## 🔗 Resources
+## Resources
 
 - [Mythril Documentation](https://mythril.docs)
 - [Solidity Best Practices](https://consensys.github.io/smart-contract-best-practices/)
 - [OpenZeppelin Docs](https://docs.openzeppelin.com)
 
-## 📄 License
+## License
 
 This project is released under the MIT License. See the [LICENSE](./LICENSE.txt) file for details.
 
-## 👥 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
